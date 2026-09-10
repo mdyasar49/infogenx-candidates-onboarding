@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import loginRouter from "./routes/login.js";
 import assessmentRouter from "./routes/assessment.js";
 import taskRouter from "./routes/task.js";
+import offerLetterRouter from "./routes/offerLetter.js";
 
 import path from "path";
 import { fileURLToPath } from "url";
@@ -14,7 +15,10 @@ const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.join(__dirname, ".env") });
 dotenv.config();
 
+const app = express();
+
 const allowedOrigins = [
+  "https://candidates.infogenx.com",
   "https://infogenx-candidates-onboarding.netlify.app",
   "http://localhost:5173",
   "http://localhost:5174",
@@ -27,7 +31,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(null, true); // Permissive for onboarding client
     }
   },
   credentials: true,
@@ -35,8 +39,8 @@ app.use(cors({
   allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: "15mb" }));
+app.use(express.urlencoded({ extended: true, limit: "15mb" }));
 
 app.get("/", (req, res) => {
   res.json({
@@ -48,6 +52,7 @@ app.get("/", (req, res) => {
 app.use("/api", loginRouter);
 app.use("/api/assessment", assessmentRouter);
 app.use("/api/task", taskRouter);
+app.use("/api/offer-letter", offerLetterRouter);
 
 const PORT = process.env.PORT || 5000;
 

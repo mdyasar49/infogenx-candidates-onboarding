@@ -149,20 +149,42 @@ function ResultPage() {
                   <p style={{ fontSize: '15px', color: '#00123C', margin: 0 }}>
                     Congratulations! You have passed the assessment and unlocked the Recruitment Task.
                   </p>
-                  <div>
+                  <div style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}>
                     <button
                       type="button"
-                      onClick={() => navigate('/task')}
+                      onClick={() => navigate('/offer-letter')}
                       style={{
                         background: 'linear-gradient(90deg, #00123C 0%, #E65525 100%)',
                         color: '#FFFFFF',
                         border: 'none',
                         borderRadius: '12px',
-                        padding: '16px 48px',
+                        padding: '16px 36px',
                         fontSize: '16px',
                         fontWeight: '700',
                         cursor: 'pointer',
-                        boxShadow: '0 10px 24px rgba(0, 18, 60, 0.18)'
+                        boxShadow: '0 10px 24px rgba(230, 85, 37, 0.28)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                      }}
+                    >
+                      <span>📄</span> Sign & Download Offer Letter
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/task')}
+                      style={{
+                        background: '#FFFFFF',
+                        color: '#00123C',
+                        border: '2px solid #00123C',
+                        borderRadius: '12px',
+                        padding: '16px 36px',
+                        fontSize: '16px',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
                       }}
                     >
                       Continue to Task →
