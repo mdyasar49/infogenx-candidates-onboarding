@@ -13,7 +13,7 @@ const OWNER_EMAIL = process.env.OWNER_EMAIL || "admin@infogenx.com";
 const DIALER_API_URL = process.env.DIALER_API_URL || "https://twilliodialer.infogenx.com/api/send-sms";
 
 /**
- * Generate SMS text for Candidate Completion Alert (GSM-7 Plain Text)
+ * Generate SMS text for Candidate Completion Alert (GSM-7 Compatible Plain Text)
  */
 export function generateCandidateSMS(candidate) {
   const dateStr = new Date().toLocaleDateString("en-AU", {
@@ -22,27 +22,29 @@ export function generateCandidateSMS(candidate) {
     month: "short",
     year: "numeric"
   });
-  const timeStr = new Date().toLocaleTimeString("en-AU", {
-    timeZone: "Australia/Brisbane",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true
-  });
 
   return (
-    `INFOGENX ONBOARDING ALERT (${dateStr})\n` +
+    `INFOGENX CANDIDATE ALERT (${dateStr})\n` +
     `----------------------------------\n` +
-    `Candidate has completed Onboarding & Assessment!\n\n` +
-    `- Name: ${candidate.name || "Candidate"}\n` +
-    `- Email: ${candidate.email || "N/A"}\n` +
-    `- Phone: ${candidate.phone || "N/A"}\n` +
-    `- College: ${candidate.college || "N/A"}\n` +
-    `- Assessment Score: ${candidate.score || 50}/50 (${candidate.percentage || 100}%) - PASSED\n` +
-    `- Task Status: ${candidate.taskStatus || "Submitted"}\n` +
-    `- Completed: ${timeStr} AEST\n` +
-    `- Portal: https://candidates.infogenx.com\n` +
+    `Assessment & Task Completed!\n\n` +
+    `Name: ${candidate.name || "N/A"}\n` +
+    `Contact & WhatsApp: ${candidate.phone || "N/A"}\n` +
+    `Location: ${candidate.location || "N/A"}\n` +
+    `Experience: ${candidate.experience || "Fresher"}\n` +
+    `Qualification: ${candidate.qualification || "N/A"}\n` +
+    `Certification: ${candidate.certification || "None"}\n` +
+    `LinkedIn: ${candidate.linkedin || "N/A"}\n` +
+    `Resume Drive Link: ${candidate.resumeLink || "N/A"}\n` +
+    `Work Duration & Timings: ${candidate.workTimings || "Full Time (Flexible)"}\n` +
+    `Start Date: ${candidate.startDate || "Immediate"}\n` +
+    `Current Salary / Rate: ${candidate.currentSalary || "N/A"}\n` +
+    `Work Status: ${candidate.workStatus || "Not working"}\n` +
+    `Work Mode: ${candidate.workMode || "WFH / Flexible"}\n` +
+    `Preferred Availability: ${candidate.availability || "Flexible (Weekdays & Weekends)"}\n` +
+    `Score: ${candidate.score || 50}/50 (${candidate.percentage || 100}%) - PASSED\n` +
+    `Task: ${candidate.taskStatus || "Submitted & Verified"}\n` +
     `----------------------------------\n` +
-    `Status: Ready for Owner & HR Final Interview.`
+    `Portal: https://candidates.infogenx.com`
   );
 }
 
@@ -68,20 +70,20 @@ export function generateCandidateEmailHtml(candidate) {
   <meta charset="UTF-8">
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7fc; margin: 0; padding: 20px; color: #1e293b; }
-    .email-container { max-width: 650px; background: #ffffff; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,18,60,0.08); border: 1px solid #e2e8f0; }
+    .email-container { max-width: 680px; background: #ffffff; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,18,60,0.08); border: 1px solid #e2e8f0; }
     .header { background: linear-gradient(135deg, #00123C 0%, #000E68 100%); padding: 30px; text-align: center; color: #ffffff; }
-    .header h1 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: 0.5px; }
+    .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
     .badge { display: inline-block; background: #E65525; color: #ffffff; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 10px; text-transform: uppercase; }
     .content { padding: 30px; }
     .alert-banner { background: #f0fdf4; border-left: 4px solid #16a34a; padding: 14px 18px; border-radius: 6px; margin-bottom: 24px; font-size: 14px; color: #166534; font-weight: 600; }
-    .section-title { font-size: 16px; font-weight: 700; color: #00123C; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin: 24px 0 16px 0; text-transform: uppercase; letter-spacing: 0.5px; }
+    .section-title { font-size: 15px; font-weight: 700; color: #00123C; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin: 24px 0 16px 0; text-transform: uppercase; letter-spacing: 0.5px; }
     .details-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    .details-table td { padding: 10px 14px; font-size: 14px; border-bottom: 1px solid #f1f5f9; }
-    .details-table td.label { font-weight: 600; color: #64748b; width: 35%; }
-    .details-table td.value { font-weight: 600; color: #0f172a; }
-    .score-box { background: linear-gradient(135deg, #00123C 0%, #E65525 100%); color: #ffffff; border-radius: 10px; padding: 20px; text-align: center; margin: 20px 0; }
-    .score-val { font-size: 36px; font-weight: 800; line-height: 1; margin: 8px 0; }
-    .btn { display: inline-block; background: #E65525; color: #ffffff !important; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 15px; text-align: center; margin-top: 10px; }
+    .details-table td { padding: 9px 12px; font-size: 13.5px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
+    .details-table td.label { font-weight: 600; color: #64748b; width: 38%; }
+    .details-table td.value { font-weight: 600; color: #0f172a; word-break: break-word; }
+    .score-box { background: linear-gradient(135deg, #00123C 0%, #E65525 100%); color: #ffffff; border-radius: 10px; padding: 18px; text-align: center; margin: 20px 0; }
+    .score-val { font-size: 34px; font-weight: 800; line-height: 1; margin: 6px 0; }
+    .btn { display: inline-block; background: #E65525; color: #ffffff !important; padding: 13px 26px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 14px; text-align: center; margin-top: 10px; }
     .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
   </style>
 </head>
@@ -89,52 +91,88 @@ export function generateCandidateEmailHtml(candidate) {
   <div class="email-container">
     <div class="header">
       <h1>INFOGENX CANDIDATE ONBOARDING</h1>
-      <span class="badge">Assessment Completed</span>
+      <span class="badge">Assessment & Task Completed</span>
     </div>
     <div class="content">
       <div class="alert-banner">
-        ✓ Candidate has successfully completed the entire Onboarding Assessment & Practical Task.
+        ✓ Candidate has completed all Onboarding stages, 50 MCQ Assessment, and Practical Recruitment Task.
       </div>
 
       <div class="score-box">
-        <div style="font-size: 14px; text-transform: uppercase; opacity: 0.9;">Assessment Result</div>
+        <div style="font-size: 13px; text-transform: uppercase; opacity: 0.9;">Assessment Result</div>
         <div class="score-val">${candidate.score || 50} / 50</div>
-        <div style="font-size: 15px; font-weight: 600;">Grade: PASSED (100% Accuracy)</div>
+        <div style="font-size: 14px; font-weight: 600;">Status: PASSED (${candidate.percentage || 100}% Marks)</div>
       </div>
 
-      <div class="section-title">Candidate Details</div>
+      <div class="section-title">Candidate Profile & Submission Details</div>
       <table class="details-table">
         <tr>
-          <td class="label">Full Name</td>
-          <td class="value">${candidate.name || "Mohamed Yasar"}</td>
+          <td class="label">Name</td>
+          <td class="value">${candidate.name || "N/A"}</td>
+        </tr>
+        <tr>
+          <td class="label">Contact & WhatsApp No.</td>
+          <td class="value">${candidate.phone || "N/A"}</td>
         </tr>
         <tr>
           <td class="label">Email Address</td>
-          <td class="value"><a href="mailto:${candidate.email || "test@infogenx.com"}">${candidate.email || "test@infogenx.com"}</a></td>
+          <td class="value"><a href="mailto:${candidate.email || ""}">${candidate.email || "N/A"}</a></td>
         </tr>
         <tr>
-          <td class="label">Phone Number</td>
-          <td class="value">${candidate.phone || "+91 97878 06366"}</td>
+          <td class="label">Location</td>
+          <td class="value">${candidate.location || "N/A"}</td>
         </tr>
         <tr>
-          <td class="label">College / University</td>
-          <td class="value">${candidate.college || "Anna University / Trichy"}</td>
+          <td class="label">Any Experience</td>
+          <td class="value">${candidate.experience || "Fresher"}</td>
         </tr>
         <tr>
-          <td class="label">Department / Degree</td>
-          <td class="value">${candidate.department || "B.E. Computer Science"}</td>
+          <td class="label">Qualification</td>
+          <td class="value">${candidate.qualification || "N/A"}</td>
         </tr>
         <tr>
-          <td class="label">Applied Job Role</td>
-          <td class="value">${candidate.role || "Software Engineer Intern"}</td>
+          <td class="label">Certification</td>
+          <td class="value">${candidate.certification || "None"}</td>
         </tr>
         <tr>
-          <td class="label">Completion Timestamp</td>
+          <td class="label">LinkedIn Profile URL</td>
+          <td class="value"><a href="${candidate.linkedin || '#'}" target="_blank">${candidate.linkedin || "N/A"}</a></td>
+        </tr>
+        <tr>
+          <td class="label">Resume Google Drive Link</td>
+          <td class="value"><a href="${candidate.resumeLink || '#'}" target="_blank">${candidate.resumeLink || "N/A"}</a></td>
+        </tr>
+        <tr>
+          <td class="label">Work Duration & Timings</td>
+          <td class="value">${candidate.workTimings || "Full Time / Flexible"}</td>
+        </tr>
+        <tr>
+          <td class="label">Start Date</td>
+          <td class="value">${candidate.startDate || "Immediate"}</td>
+        </tr>
+        <tr>
+          <td class="label">Monthly Take Home / Rate</td>
+          <td class="value">${candidate.currentSalary || "N/A"}</td>
+        </tr>
+        <tr>
+          <td class="label">Current Work Status</td>
+          <td class="value">${candidate.workStatus || "Not working"}</td>
+        </tr>
+        <tr>
+          <td class="label">If Working (Mode)</td>
+          <td class="value">${candidate.workMode || "WFH / Flexible"}</td>
+        </tr>
+        <tr>
+          <td class="label">Preferred Availability</td>
+          <td class="value">${candidate.availability || "Weekday & Weekend Time Slots"}</td>
+        </tr>
+        <tr>
+          <td class="label">Completed Timestamp</td>
           <td class="value">${dateStr} at ${timeStr}</td>
         </tr>
       </table>
 
-      <div class="section-title">Onboarding Stages Status</div>
+      <div class="section-title">Onboarding Verification Status</div>
       <table class="details-table">
         <tr>
           <td class="label">1. SOP Guide Review</td>
@@ -146,15 +184,15 @@ export function generateCandidateEmailHtml(candidate) {
         </tr>
         <tr>
           <td class="label">3. 50 MCQ Assessment</td>
-          <td class="value" style="color: #16a34a;">✓ 50/50 Marks (Passed)</td>
+          <td class="value" style="color: #16a34a;">✓ ${candidate.score || 50}/50 Marks (Passed)</td>
         </tr>
         <tr>
           <td class="label">4. Practical Recruitment Task</td>
-          <td class="value" style="color: #16a34a;">✓ Screenshot Proof Submitted</td>
+          <td class="value" style="color: #16a34a;">✓ ${candidate.taskStatus || "Proof Submitted & Verified"}</td>
         </tr>
       </table>
 
-      <div style="text-align: center; margin: 30px 0 10px;">
+      <div style="text-align: center; margin: 25px 0 10px;">
         <a href="https://candidates.infogenx.com/admin" class="btn">Review Candidate in Portal</a>
       </div>
     </div>
@@ -179,7 +217,6 @@ export async function sendCompletionSMS(candidate) {
   for (const number of FORWARD_SMS_NUMBERS) {
     try {
       console.log(`[NotificationService] Sending SMS alert to ${number}...`);
-      // Integration with Twilio Dialer endpoint or direct webhook
       results.push({ number, status: "queued", message: messageBody });
     } catch (err) {
       console.error(`[NotificationService] Failed to send SMS to ${number}:`, err.message);
@@ -188,3 +225,4 @@ export async function sendCompletionSMS(candidate) {
   }
   return results;
 }
+
