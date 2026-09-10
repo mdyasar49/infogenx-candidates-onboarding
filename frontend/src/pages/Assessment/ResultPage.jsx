@@ -87,7 +87,7 @@ function ResultPage() {
   const isTestUser = user?.role === 'test_user' || user?.role === 'test'
 
   const handleReattempt = () => {
-    if (!isTestUser && attemptNumber >= 3) return
+    if (!isTestUser) return // Candidates are strictly limited to 1 attempt
     const nextAttempt = attemptNumber + 1
     if (user?.email) {
       sessionStorage.setItem(`infogenx_attempt_count_${user.email}`, nextAttempt.toString())
@@ -247,7 +247,7 @@ function ResultPage() {
                 <div style={{ background: '#FFF8F3', border: '1px solid rgba(0, 18, 60, 0.08)', borderRadius: '14px', padding: '16px', textAlign: 'center' }}>
                   <span style={{ fontSize: '12px', color: '#5C6A86', fontWeight: '700', textTransform: 'uppercase' }}>Attempt Recorded</span>
                   <p style={{ fontSize: '18px', fontWeight: '800', color: isTestUser ? '#E65525' : '#00123C', margin: '4px 0 0' }}>
-                    {isTestUser ? `Attempt ${attemptNumber} (Unlimited 🧪)` : `Attempt ${attemptNumber} of 3`}
+                    {isTestUser ? `Attempt ${attemptNumber} (Unlimited 🧪)` : `Attempt 1 of 1`}
                   </p>
                 </div>
 
@@ -623,16 +623,12 @@ function ResultPage() {
                 </div>
               ) : (
                 <div style={{ width: '100%', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  {attemptNumber < 3 || isTestUser ? (
+                  {isTestUser ? (
                     <>
                       <p style={{ fontSize: '15px', color: '#00123C', margin: 0 }}>
-                        {isTestUser ? (
-                          <span style={{ color: '#E65525', fontWeight: '700' }}>
-                            🧪 Unlimited Test Mode Active: You can reattempt this assessment without restrictions.
-                          </span>
-                        ) : (
-                          `You require 80% (40/50) to pass. You have ${3 - attemptNumber} reattempt(s) remaining.`
-                        )}
+                        <span style={{ color: '#E65525', fontWeight: '700' }}>
+                          🧪 Unlimited Test Mode Active: You can reattempt this assessment without restrictions.
+                        </span>
                       </p>
                       <div>
                         <button
@@ -650,7 +646,7 @@ function ResultPage() {
                             boxShadow: '0 10px 24px rgba(230, 85, 37, 0.2)'
                           }}
                         >
-                          {isTestUser ? 'Reattempt Assessment (Unlimited Test Mode) ↺' : 'Reattempt Assessment ↺'}
+                          Reattempt Assessment (Unlimited Test Mode) ↺
                         </button>
                       </div>
                     </>
@@ -664,7 +660,7 @@ function ResultPage() {
                       fontSize: '15px',
                       fontWeight: '700'
                     }}>
-                      Maximum attempts (3/3) reached. No further attempts available.
+                      Maximum attempts (1/1) reached. Candidates are granted strictly 1 assessment attempt.
                     </div>
                   )}
                 </div>

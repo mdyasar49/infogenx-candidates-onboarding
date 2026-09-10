@@ -695,8 +695,8 @@ function AdminOfferReviewPage() {
                         onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
                         style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1.5px solid #00123C', fontSize: '14px', fontWeight: '700', background: '#FFF8F3', boxSizing: 'border-box' }}
                       >
-                        <option value="candidate">Candidate (Student - Standard 3 Attempts)</option>
-                        <option value="student">Student (Standard 3 Attempts)</option>
+                        <option value="candidate">Candidate (Student - 1 Attempt Only)</option>
+                        <option value="student">Student (1 Attempt Only)</option>
                         <option value="test_user">Test User (🧪 Unlimited Assessment Attempts)</option>
                         <option value="admin">Administrator (🛡️ Monitor All &amp; Edit All)</option>
                       </select>

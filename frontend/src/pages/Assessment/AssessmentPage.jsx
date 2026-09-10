@@ -13,6 +13,7 @@ function AssessmentPage() {
   const [userAnswers, setUserAnswers] = useState({})
   const [submitting, setSubmitting] = useState(false)
   const [attemptCount, setAttemptCount] = useState(1)
+  const [hasCompletedAttempt, setHasCompletedAttempt] = useState(false)
   const isTestUser = user?.role === 'test_user' || user?.role === 'test'
 
   const questions = questionBank
@@ -20,11 +21,15 @@ function AssessmentPage() {
   useEffect(() => {
     if (user?.email) {
       const storedCount = sessionStorage.getItem(`infogenx_attempt_count_${user.email}`)
+      const storedResult = sessionStorage.getItem(`infogenx_assessment_result_${user.email}`)
       if (storedCount) {
         setAttemptCount(parseInt(storedCount, 10))
       }
+      if (storedResult && !isTestUser) {
+        setHasCompletedAttempt(true)
+      }
     }
-  }, [user])
+  }, [user, isTestUser])
 
   const handleSelectOption = (qId, optionIndex) => {
     setUserAnswers((prev) => ({
@@ -159,7 +164,7 @@ function AssessmentPage() {
                 <div style={{ padding: '12px', borderLeft: '1px solid rgba(0, 18, 60, 0.08)' }}>
                   <span style={{ fontSize: '28px', fontWeight: '800', color: isTestUser ? '#E65525' : '#00123C', display: 'block' }}>Attempt #{attemptCount}</span>
                   <span style={{ fontSize: '13px', color: isTestUser ? '#E65525' : '#5C6A86', fontWeight: isTestUser ? '700' : '600' }}>
-                    {isTestUser ? '🧪 Unlimited Attempts (Test Mode)' : 'Maximum 3 Attempts Allowed'}
+                    {isTestUser ? '🧪 Unlimited Attempts (Test Mode)' : 'Strictly 1 Attempt Allowed'}
                   </span>
                 </div>
               </div>
@@ -167,31 +172,65 @@ function AssessmentPage() {
               <div style={{ background: '#FFF7F5', borderRadius: '14px', padding: '20px', border: '1px solid rgba(230, 85, 37, 0.2)' }}>
                 <h4 style={{ color: '#E65525', margin: '0 0 10px', fontSize: '15px', fontWeight: '700' }}>Assessment Instructions</h4>
                 <ul style={{ paddingLeft: '20px', fontSize: '14px', color: '#00123C', display: 'flex', flexDirection: 'column', gap: '8px', margin: 0 }}>
+                  <li>Candidates are granted <strong>strictly 1 test attempt</strong>. Please ensure undisturbed time and stable connectivity.</li>
                   <li>Achieve <strong>40/50 marks (80%)</strong> or higher to clear the assessment.</li>
-                  <li>Click <strong>Start Assessment</strong> below when ready. The questions will appear immediately.</li>
-                  <li>Upon passing, you will be cleared to access the Recruitment Task page.</li>
+                  <li>Upon passing, you will proceed to the Recruitment Task and Offer Letter release.</li>
                 </ul>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'center', marginTop: '8px' }}>
-                <button
-                  type="button"
-                  onClick={() => setViewState('EXAM')}
-                  style={{
-                    background: 'linear-gradient(90deg, #00123C 0%, #E65525 100%)',
-                    color: '#FFFFFF',
-                    border: 'none',
-                    borderRadius: '12px',
-                    padding: '16px 48px',
-                    fontSize: '17px',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    boxShadow: '0 10px 24px rgba(0, 18, 60, 0.18)',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
-                  Start Assessment →
-                </button>
+                {hasCompletedAttempt && !isTestUser ? (
+                  <div style={{ textAlign: 'center' }}>
+                    <div style={{
+                      background: '#FEF2F2',
+                      border: '1px solid #FCA5A5',
+                      color: '#991B1B',
+                      padding: '14px 28px',
+                      borderRadius: '10px',
+                      fontWeight: '700',
+                      fontSize: '14px',
+                      marginBottom: '16px'
+                    }}>
+                      ⚠️ You have already completed your 1 permitted assessment attempt.
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => navigate('/result')}
+                      style={{
+                        background: 'linear-gradient(90deg, #00123C 0%, #E65525 100%)',
+                        color: '#FFFFFF',
+                        border: 'none',
+                        borderRadius: '12px',
+                        padding: '14px 38px',
+                        fontSize: '16px',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        boxShadow: '0 8px 20px rgba(0, 18, 60, 0.15)'
+                      }}
+                    >
+                      View Your Assessment Result →
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setViewState('EXAM')}
+                    style={{
+                      background: 'linear-gradient(90deg, #00123C 0%, #E65525 100%)',
+                      color: '#FFFFFF',
+                      border: 'none',
+                      borderRadius: '12px',
+                      padding: '16px 48px',
+                      fontSize: '17px',
+                      fontWeight: '700',
+                      cursor: 'pointer',
+                      boxShadow: '0 10px 24px rgba(0, 18, 60, 0.18)',
+                      transition: 'all 0.2s ease'
+                    }}
+                  >
+                    Start Assessment →
+                  </button>
+                )}
               </div>
             </div>
           )}
