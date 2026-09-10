@@ -35,6 +35,10 @@ function OfferLetterView() {
   const [isDrawing, setIsDrawing] = useState(false)
   const [canvasHasContent, setCanvasHasContent] = useState(false)
 
+  // Admin Approval Workflow State
+  const [approvalStatus, setApprovalStatus] = useState('CHECKING') // 'CHECKING' | 'PENDING_APPROVAL' | 'APPROVED'
+  const [offerToken, setOfferToken] = useState(null)
+
   const canvasRef = useRef(null)
   const fileInputRef = useRef(null)
 
@@ -42,6 +46,81 @@ function OfferLetterView() {
   const candidateEmail = user?.email || ''
   const todayDateStr = getFormattedDate()
   const startDateStr = getFormattedDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
+
+  const defaultApi = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://api.infogenx.com'
+  const apiUrl = import.meta.env.VITE_API_URL || defaultApi
+  const isAdmin = user?.role === 'ADMIN' || user?.email === 'test@infogenx.com' || user?.email?.includes('admin@')
+
+  // Check Approval Status from backend on mount
+  useEffect(() => {
+    async function checkApproval() {
+      if (!candidateEmail) return
+      try {
+        const res = await fetch(`${apiUrl}/api/offer-letter/status?email=${encodeURIComponent(candidateEmail)}`)
+        const data = await res.json()
+        if (data.success) {
+          if (data.status === 'APPROVED' || data.status === 'ACCEPTED') {
+            setApprovalStatus('APPROVED')
+            if (data.offer) {
+              setOfferToken(data.offer.token)
+              if (data.offer.role) {
+                const rKey = detectRoleKey(data.offer.role)
+                setSelectedRoleKey(rKey)
+              }
+              if (data.offer.salary) {
+                setCustomSalary(data.offer.salary)
+              }
+            }
+          } else if (data.status === 'PENDING_APPROVAL') {
+            setApprovalStatus('PENDING_APPROVAL')
+            if (data.offer?.token) setOfferToken(data.offer.token)
+          } else {
+            // NOT_REQUESTED: Trigger automatic request to Admin
+            handleAutoRequest()
+          }
+        } else {
+          setApprovalStatus('PENDING_APPROVAL')
+        }
+      } catch (err) {
+        console.warn('Error checking offer status:', err)
+        setApprovalStatus('PENDING_APPROVAL')
+      }
+    }
+
+    const handleAutoRequest = async () => {
+      try {
+        const storedResult = sessionStorage.getItem(`infogenx_assessment_result_${candidateEmail}`)
+        let scoreStr = 'Passed'
+        if (storedResult) {
+          try {
+            const parsed = JSON.parse(storedResult)
+            scoreStr = `${parsed.percentage}% (${parsed.score}/50)`
+          } catch (e) {}
+        }
+
+        const res = await fetch(`${apiUrl}/api/offer-letter/request-approval`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            candidateName,
+            candidateEmail,
+            score: scoreStr,
+            requestedRole: activeRoleConfig.title,
+            department: activeRoleConfig.department
+          })
+        })
+        const data = await res.json()
+        if (data.success) {
+          setApprovalStatus(data.status || 'PENDING_APPROVAL')
+          if (data.token) setOfferToken(data.token)
+        }
+      } catch (e) {
+        setApprovalStatus('PENDING_APPROVAL')
+      }
+    }
+
+    checkApproval()
+  }, [candidateEmail, apiUrl])
 
   // Update default salary when changing role track
   const handleRoleChange = (e) => {
@@ -287,17 +366,25 @@ function OfferLetterView() {
           <button type="button" className="btn-secondary" onClick={() => navigate('/result')}>
             ← Back to Results
           </button>
-          <button type="button" className="btn-primary" onClick={handleDownloadPDF}>
-            🖨️ Download PDF / Print
-          </button>
-          <button
-            type="button"
-            className="btn-accent"
-            onClick={handleSendEmail}
-            disabled={sendingEmail}
-          >
-            {sendingEmail ? '✉️ Sending...' : '✉️ Send PDF to My Email'}
-          </button>
+          {(approvalStatus === 'APPROVED' || isAdmin) ? (
+            <>
+              <button type="button" className="btn-primary" onClick={handleDownloadPDF}>
+                🖨️ Download PDF / Print
+              </button>
+              <button
+                type="button"
+                className="btn-accent"
+                onClick={handleSendEmail}
+                disabled={sendingEmail}
+              >
+                {sendingEmail ? '✉️ Sending...' : '✉️ Send Signed PDF to My Email'}
+              </button>
+            </>
+          ) : (
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '8px 16px', background: '#FFFBEB', borderRadius: '8px', color: '#B45309', fontSize: '13px', fontWeight: '700', border: '1px solid #FDE68A' }}>
+              <span>🔒 Official PDF &amp; Email release unlocks upon Admin Approval</span>
+            </div>
+          )}
         </div>
 
         <div className="offer-actions-right">
@@ -314,50 +401,107 @@ function OfferLetterView() {
         </div>
       )}
 
-      {/* Role & Package Customizer Box (Interactive & Role-Specific) */}
-      <div className="role-customizer-box no-print">
-        <div className="role-customizer-header">
-          <h4>💼 Position Track & Package Configuration</h4>
-          <span className="dept-badge">
-            🏢 {activeRoleConfig.department}
-          </span>
-        </div>
+      {/* Pending Admin Approval Banner */}
+      {approvalStatus === 'PENDING_APPROVAL' && (
+        <div className="offer-pending-card no-print">
+          <div className="offer-pending-header">
+            <h3>⏳ Offer Letter Pending HR / Management Review</h3>
+            <span className="badge-pending-status">
+              Awaiting Admin Approval
+            </span>
+          </div>
+          <p className="offer-pending-desc">
+            Your assessment outcome has been recorded and submitted to the <strong>Infogenx HR Management Team</strong>.
+            The Admin is currently reviewing your profile, validating your department track, and customizing your official compensation and start date.
+            Once approved by Management, your official Offer Letter will unlock here and you will receive a notification email.
+          </p>
 
-        <div className="role-customizer-grid">
-          <div className="role-field-group">
-            <label htmlFor="role-select">Select Candidate Job Role</label>
-            <select
-              id="role-select"
-              className="role-select-input"
-              value={selectedRoleKey}
-              onChange={handleRoleChange}
-            >
-              {Object.values(ROLE_OFFER_CONFIGS).map((cfg) => (
-                <option key={cfg.id} value={cfg.id}>
-                  {cfg.title} — ({cfg.department})
-                </option>
-              ))}
-            </select>
+          <div className="approval-timeline">
+            <div className="timeline-step completed">
+              <span className="step-circle">✓</span>
+              <span>1. Assessment Completed</span>
+            </div>
+            <div className="timeline-step active">
+              <span className="step-circle">⏳</span>
+              <span>2. Admin Review &amp; Approval (In Progress)</span>
+            </div>
+            <div className="timeline-step">
+              <span className="step-circle">3</span>
+              <span>3. Offer Released &amp; E-Signature</span>
+            </div>
           </div>
 
-          <div className="role-field-group">
-            <label htmlFor="salary-input">Monthly Gross Remuneration</label>
-            <div className="salary-input-wrapper">
-              <input
-                id="salary-input"
-                type="text"
-                className="salary-text-input"
-                value={customSalary}
-                onChange={(e) => setCustomSalary(e.target.value)}
-                placeholder="e.g. ₹35,000 per month"
-              />
+          {isAdmin && (
+            <div style={{ marginTop: '16px', paddingTop: '14px', borderTop: '1px dashed #FDE68A', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+              <span style={{ fontSize: '13px', color: '#92400E', fontWeight: '700' }}>
+                🛡️ You are logged in as Admin / HR Reviewer:
+              </span>
+              <button
+                type="button"
+                className="btn-open-admin-console"
+                onClick={() => navigate(offerToken ? `/admin/offer-review?token=${offerToken}` : '/admin/offer-review')}
+              >
+                Open Admin Approval Console →
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Approved Success Notification Banner */}
+      {approvalStatus === 'APPROVED' && (
+        <div className="offer-approved-banner no-print">
+          <span>✓</span>
+          <span>Official Offer Letter has been reviewed and approved by Infogenx Management. Please review the terms and provide your signature below.</span>
+        </div>
+      )}
+
+      {/* Role & Package Customizer Box (Visible to Admin or for Preview) */}
+      {(isAdmin || approvalStatus === 'APPROVED') && (
+        <div className="role-customizer-box no-print">
+          <div className="role-customizer-header">
+            <h4>💼 Position Track & Package Configuration</h4>
+            <span className="dept-badge">
+              🏢 {activeRoleConfig.department}
+            </span>
+          </div>
+
+          <div className="role-customizer-grid">
+            <div className="role-field-group">
+              <label htmlFor="role-select">Select Candidate Job Role</label>
+              <select
+                id="role-select"
+                className="role-select-input"
+                value={selectedRoleKey}
+                onChange={handleRoleChange}
+              >
+                {Object.values(ROLE_OFFER_CONFIGS).map((cfg) => (
+                  <option key={cfg.id} value={cfg.id}>
+                    {cfg.title} — ({cfg.department})
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="role-field-group">
+              <label htmlFor="salary-input">Monthly Gross Remuneration</label>
+              <div className="salary-input-wrapper">
+                <input
+                  id="salary-input"
+                  type="text"
+                  className="salary-text-input"
+                  value={customSalary}
+                  onChange={(e) => setCustomSalary(e.target.value)}
+                  placeholder="e.g. ₹35,000 per month"
+                />
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {/* E-Signature Control Box (hidden during print) */}
-      {!signatureData && (
+      {/* E-Signature Control Box (Available when Approved or in Admin Mode) */}
+      {approvalStatus === 'APPROVED' && !signatureData && (
         <div className="signature-input-box no-print">
           <div className="sig-box-header">
             <h3>✍️ Provide Your Signature to Accept Offer</h3>

@@ -17,6 +17,7 @@ import SignaturePage from '../pages/Onboarding/SignaturePage'
 import SOPPage from '../pages/Onboarding/SOPPage'
 import TermsConditionsPage from '../pages/Onboarding/TermsConditionsPage'
 import CompletionPage from '../pages/Dashboard/CompletionPage'
+import AdminOfferReviewPage from '../pages/Admin/AdminOfferReviewPage'
 import ProtectedRoute from '../components/ProtectedRoute'
 import VisualTheme from '../components/VisualTheme'
 
@@ -56,6 +57,10 @@ function AppRoutes() {
         <Route path="/onboarding" element={<ProtectedRoute><OnboardingPage /></ProtectedRoute>} />
         <Route path="/terms" element={<ProtectedRoute><TermsConditionsPage /></ProtectedRoute>} />
         <Route path="/completion" element={<ProtectedRoute><CompletionPage /></ProtectedRoute>} />
+
+        {/* Admin Offer Review & Approval Console */}
+        <Route path="/admin/offer-review" element={<AdminOfferReviewPage />} />
+        <Route path="/admin/offers" element={<ProtectedRoute><AdminOfferReviewPage /></ProtectedRoute>} />
 
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
