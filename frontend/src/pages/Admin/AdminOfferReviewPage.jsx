@@ -23,12 +23,6 @@ function AdminOfferReviewPage() {
   const [activeTab, setActiveTab] = useState('directory') // 'directory' | 'offers'
   const [userSearch, setUserSearch] = useState('')
 
-  // Edit user modal state
-  const [editingUser, setEditingUser] = useState(null)
-  const [userForm, setUserForm] = useState({ name: '', email: '', role: 'candidate', mobile: '', location: '', qualification: '', password: '' })
-  const [savingUser, setSavingUser] = useState(false)
-  const [userEditMsg, setUserEditMsg] = useState(null)
-
   // Form states
   const [selectedRoleKey, setSelectedRoleKey] = useState('bde')
   const [department, setDepartment] = useState('')
@@ -87,12 +81,38 @@ function AdminOfferReviewPage() {
     loadData()
   }, [token, apiUrl])
 
+  // Edit user modal state
+  const [editingUser, setEditingUser] = useState(null)
+  const [isCreatingUser, setIsCreatingUser] = useState(false)
+  const [userForm, setUserForm] = useState({ name: '', email: '', role: 'candidate', mobile: '', location: '', qualification: '', password: '', max_attempts: 1, assessment_attempts: 0 })
+  const [savingUser, setSavingUser] = useState(false)
+  const [userEditMsg, setUserEditMsg] = useState(null)
+
+  const handleOpenCreateUser = () => {
+    setEditingUser(null)
+    setIsCreatingUser(true)
+    setUserForm({
+      name: '',
+      email: '',
+      role: 'candidate',
+      max_attempts: 1,
+      assessment_attempts: 0,
+      mobile: '',
+      location: '',
+      qualification: '',
+      password: 'candidate123'
+    })
+    setUserEditMsg(null)
+  }
+
   const handleOpenEditUser = (u) => {
+    setIsCreatingUser(false)
     setEditingUser(u)
     setUserForm({
       name: u.name || '',
       email: u.email || '',
       role: u.role || 'candidate',
+      max_attempts: u.max_attempts !== undefined ? u.max_attempts : (u.role === 'test_user' || u.role === 'admin' ? -1 : 1),
       assessment_attempts: u.assessment_attempts !== undefined ? u.assessment_attempts : 0,
       mobile: u.mobile || '',
       location: u.location || '',
@@ -116,7 +136,6 @@ function AdminOfferReviewPage() {
       const data = await res.json()
       if (data.success) {
         setUserEditMsg({ type: 'success', text: '✓ User details & role updated in cPanel DB!' })
-        // Refresh users list
         await loadData()
         setTimeout(() => {
           setEditingUser(null)
@@ -128,6 +147,51 @@ function AdminOfferReviewPage() {
       setUserEditMsg({ type: 'error', text: `Network error: ${err.message}` })
     } finally {
       setSavingUser(false)
+    }
+  }
+
+  const handleCreateUser = async (e) => {
+    e.preventDefault()
+    setSavingUser(true)
+    setUserEditMsg(null)
+    try {
+      const res = await fetch(`${apiUrl}/api/candidate-auth/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userForm)
+      })
+      const data = await res.json()
+      if (data.success) {
+        setUserEditMsg({ type: 'success', text: '✓ New user added successfully to cPanel DB!' })
+        await loadData()
+        setTimeout(() => {
+          setIsCreatingUser(false)
+        }, 1200)
+      } else {
+        setUserEditMsg({ type: 'error', text: data.message || 'Failed to create user.' })
+      }
+    } catch (err) {
+      setUserEditMsg({ type: 'error', text: `Network error: ${err.message}` })
+    } finally {
+      setSavingUser(false)
+    }
+  }
+
+  const handleDeleteUser = async (u) => {
+    if (!window.confirm(`Are you sure you want to delete user ${u.name} (${u.email}) from cPanel DB?`)) return
+    try {
+      const res = await fetch(`${apiUrl}/api/candidate-auth/users/${u.id}`, {
+        method: 'DELETE'
+      })
+      const data = await res.json()
+      if (data.success) {
+        alert('User removed from cPanel DB.')
+        await loadData()
+      } else {
+        alert(data.message || 'Failed to delete user.')
+      }
+    } catch (err) {
+      alert(`Delete error: ${err.message}`)
     }
   }
 
@@ -479,19 +543,41 @@ function AdminOfferReviewPage() {
                   <h3 style={{ margin: 0, fontSize: '18px', color: '#00123C' }}>
                     👥 Registered Candidate Users (MySQL cPanel DB: <code style={{ color: '#E65525' }}>infogenxblog</code>)
                   </h3>
-                  <input
-                    type="text"
-                    placeholder="Search candidate name, email, or role..."
-                    value={userSearch}
-                    onChange={(e) => setUserSearch(e.target.value)}
-                    style={{
-                      padding: '8px 16px',
-                      borderRadius: '8px',
-                      border: '1px solid #CBD5E1',
-                      fontSize: '13.5px',
-                      width: '280px'
-                    }}
-                  />
+                  <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    <input
+                      type="text"
+                      placeholder="Search candidate name, email, or role..."
+                      value={userSearch}
+                      onChange={(e) => setUserSearch(e.target.value)}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: '8px',
+                        border: '1px solid #CBD5E1',
+                        fontSize: '13.5px',
+                        width: '240px'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={handleOpenCreateUser}
+                      style={{
+                        padding: '8px 18px',
+                        borderRadius: '8px',
+                        border: 'none',
+                        background: 'linear-gradient(90deg, #15803D 0%, #16A34A 100%)',
+                        color: '#FFFFFF',
+                        fontWeight: '700',
+                        fontSize: '13.5px',
+                        cursor: 'pointer',
+                        boxShadow: '0 2px 8px rgba(22, 163, 74, 0.25)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px'
+                      }}
+                    >
+                      ➕ Add User / Role
+                    </button>
+                  </div>
                 </div>
 
                 <div style={{ overflowX: 'auto' }}>
@@ -538,11 +624,11 @@ function AdminOfferReviewPage() {
                               </span>
                             </td>
                             <td>
-                              {u.role === 'test_user' ? (
+                              {u.max_attempts === -1 || u.role === 'test_user' || u.role === 'admin' ? (
                                 <span style={{ color: '#E65525', fontWeight: '700' }}>Unlimited 🧪 ({u.assessment_attempts || 0} taken)</span>
                               ) : (
-                                <span style={{ fontWeight: '700', color: (u.assessment_attempts || 0) >= 1 ? '#DC2626' : '#16A34A' }}>
-                                  {(u.assessment_attempts || 0) >= 1 ? '1 / 1 (Exhausted)' : '0 / 1 (Available)'}
+                                <span style={{ fontWeight: '700', color: (u.assessment_attempts || 0) >= (u.max_attempts || 1) ? '#DC2626' : '#16A34A' }}>
+                                  {u.assessment_attempts || 0} / {u.max_attempts || 1} {(u.assessment_attempts || 0) >= (u.max_attempts || 1) ? '(Exhausted)' : '(Available)'}
                                 </span>
                               )}
                             </td>
@@ -550,14 +636,25 @@ function AdminOfferReviewPage() {
                             <td>{u.location || '—'}</td>
                             <td>{u.qualification || '—'}</td>
                             <td>
-                              <button
-                                type="button"
-                                className="btn-review-action"
-                                onClick={() => handleOpenEditUser(u)}
-                                style={{ background: '#00123C', padding: '6px 14px' }}
-                              >
-                                Edit ✏️
-                              </button>
+                              <div style={{ display: 'flex', gap: '6px' }}>
+                                <button
+                                  type="button"
+                                  className="btn-review-action"
+                                  onClick={() => handleOpenEditUser(u)}
+                                  style={{ background: '#00123C', padding: '6px 12px' }}
+                                >
+                                  Edit ✏️
+                                </button>
+                                <button
+                                  type="button"
+                                  className="btn-review-action"
+                                  onClick={() => handleDeleteUser(u)}
+                                  style={{ background: '#DC2626', padding: '6px 10px' }}
+                                  title="Delete user"
+                                >
+                                  🗑️
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -622,8 +719,8 @@ function AdminOfferReviewPage() {
               </div>
             )}
 
-            {/* Edit User Modal Dialog */}
-            {editingUser && (
+            {/* Create / Edit User Modal Dialog */}
+            {(editingUser || isCreatingUser) && (
               <div style={{
                 position: 'fixed',
                 top: 0,
@@ -647,12 +744,17 @@ function AdminOfferReviewPage() {
                   border: '1px solid #CBD5E1'
                 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
-                    <h3 style={{ margin: 0, color: '#00123C', fontSize: '20px', fontWeight: '800' }}>
-                      ✏️ Edit User Details &amp; Role
-                    </h3>
+                    <div>
+                      <h3 style={{ margin: 0, color: '#00123C', fontSize: '20px', fontWeight: '800' }}>
+                        {isCreatingUser ? '➕ Add User to cPanel DB' : '✏️ Edit User Details & Role'}
+                      </h3>
+                      <p style={{ margin: '4px 0 0', fontSize: '13px', color: '#64748B' }}>
+                        {isCreatingUser ? 'Manually register a candidate, tester, or admin' : `Managing ${editingUser.name} (${editingUser.email})`}
+                      </p>
+                    </div>
                     <button
                       type="button"
-                      onClick={() => setEditingUser(null)}
+                      onClick={() => { setEditingUser(null); setIsCreatingUser(false); }}
                       style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#64748B' }}
                     >
                       ✕
@@ -674,7 +776,7 @@ function AdminOfferReviewPage() {
                     </div>
                   )}
 
-                  <form onSubmit={handleSaveUser} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <form onSubmit={isCreatingUser ? handleCreateUser : handleSaveUser} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                     <div>
                       <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>Full Name</label>
                       <input
@@ -697,20 +799,41 @@ function AdminOfferReviewPage() {
                       />
                     </div>
 
-                    <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>
-                        Assigned User Role
-                      </label>
-                      <select
-                        value={userForm.role}
-                        onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
-                        style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1.5px solid #00123C', fontSize: '14px', fontWeight: '700', background: '#FFF8F3', boxSizing: 'border-box' }}
-                      >
-                        <option value="candidate">Candidate (Student - 1 Attempt Only)</option>
-                        <option value="student">Student (1 Attempt Only)</option>
-                        <option value="test_user">Test User (🧪 Unlimited Assessment Attempts)</option>
-                        <option value="admin">Administrator (🛡️ Monitor All &amp; Edit All)</option>
-                      </select>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>
+                          Assigned User Role
+                        </label>
+                        <select
+                          value={userForm.role}
+                          onChange={(e) => {
+                            const newRole = e.target.value
+                            setUserForm({
+                              ...userForm,
+                              role: newRole,
+                              max_attempts: newRole === 'test_user' || newRole === 'admin' ? -1 : 1
+                            })
+                          }}
+                          style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1.5px solid #00123C', fontSize: '13.5px', fontWeight: '700', background: '#FFF8F3', boxSizing: 'border-box' }}
+                        >
+                          <option value="candidate">Candidate (1 Attempt Only)</option>
+                          <option value="student">Student (1 Attempt Only)</option>
+                          <option value="test_user">Test User (🧪 Unlimited Attempts)</option>
+                          <option value="admin">Administrator (🛡️ Monitor &amp; Edit All)</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>
+                          Max Attempts (-1 = Unlimited)
+                        </label>
+                        <input
+                          type="number"
+                          value={userForm.max_attempts}
+                          onChange={(e) => setUserForm({ ...userForm, max_attempts: parseInt(e.target.value, 10) })}
+                          style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
+                        />
+                      </div>
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
@@ -736,18 +859,20 @@ function AdminOfferReviewPage() {
                       </div>
                     </div>
 
-                    <div>
-                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>
-                        Test Attempts Completed (Candidates allowed 1 attempt; change to 0 to grant re-test)
-                      </label>
-                      <input
-                        type="number"
-                        min="0"
-                        value={userForm.assessment_attempts}
-                        onChange={(e) => setUserForm({ ...userForm, assessment_attempts: parseInt(e.target.value, 10) || 0 })}
-                        style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
-                      />
-                    </div>
+                    {!isCreatingUser && (
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>
+                          Test Attempts Taken (Change to 0 to grant re-test)
+                        </label>
+                        <input
+                          type="number"
+                          min="0"
+                          value={userForm.assessment_attempts}
+                          onChange={(e) => setUserForm({ ...userForm, assessment_attempts: parseInt(e.target.value, 10) || 0 })}
+                          style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
+                        />
+                      </div>
+                    )}
 
                     <div>
                       <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>Qualification</label>
@@ -762,13 +887,14 @@ function AdminOfferReviewPage() {
 
                     <div>
                       <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>
-                        Reset Password (Optional - leave blank to keep unchanged)
+                        {isCreatingUser ? 'Initial Password *' : 'Reset Password (Leave blank to keep current)'}
                       </label>
                       <input
                         type="text"
+                        required={isCreatingUser}
                         value={userForm.password}
                         onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
-                        placeholder="New Password"
+                        placeholder={isCreatingUser ? 'Set login password' : 'New Password (Optional)'}
                         style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
                       />
                     </div>
@@ -776,7 +902,7 @@ function AdminOfferReviewPage() {
                     <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '14px' }}>
                       <button
                         type="button"
-                        onClick={() => setEditingUser(null)}
+                        onClick={() => { setEditingUser(null); setIsCreatingUser(false); }}
                         style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #CBD5E1', background: '#FFFFFF', color: '#334155', fontWeight: '700', cursor: 'pointer' }}
                       >
                         Cancel
@@ -794,7 +920,7 @@ function AdminOfferReviewPage() {
                           cursor: savingUser ? 'not-allowed' : 'pointer'
                         }}
                       >
-                        {savingUser ? 'Saving Changes...' : 'Save User Changes ✓'}
+                        {savingUser ? 'Saving Changes...' : isCreatingUser ? 'Create User in cPanel DB ✓' : 'Save User Changes ✓'}
                       </button>
                     </div>
                   </form>
