@@ -21,8 +21,12 @@ Write-Host "Site User     : $SiteUser" -ForegroundColor Green
 Write-Host "==================================================" -ForegroundColor Cyan
 
 # Step 1: Install & Build
-Write-Host "1. Building production bundle (dist)..." -ForegroundColor Yellow
+Write-Host "1. Checking dependencies and building bundle (dist)..." -ForegroundColor Yellow
 Push-Location $frontendDir
+if (-not (Test-Path "$frontendDir\node_modules")) {
+    Write-Host "Installing dependencies in frontend..." -ForegroundColor Cyan
+    & npm install
+}
 & npm run build
 Pop-Location
 
