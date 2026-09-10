@@ -20,6 +20,19 @@ function AssessmentPage() {
 
   useEffect(() => {
     if (user?.email) {
+      const defaultApi = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://api.infogenx.com'
+      const apiUrl = import.meta.env.VITE_API_URL || defaultApi
+
+      // Check live backend attempt count from cPanel DB
+      fetch(`${apiUrl}/api/candidate-auth/check-attempt?email=${encodeURIComponent(user.email)}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.success && !data.canAttempt) {
+            setHasCompletedAttempt(true)
+          }
+        })
+        .catch(() => {})
+
       const storedCount = sessionStorage.getItem(`infogenx_attempt_count_${user.email}`)
       const storedResult = sessionStorage.getItem(`infogenx_assessment_result_${user.email}`)
       if (storedCount) {
@@ -88,7 +101,20 @@ function AssessmentPage() {
       sessionStorage.setItem(`infogenx_attempt_count_${user.email}`, currentAttempt.toString())
     }
 
-    // Try posting to backend endpoint if reachable
+    // Record attempt in backend cPanel MySQL DB
+    try {
+      const defaultApi = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://api.infogenx.com'
+      const apiUrl = import.meta.env.VITE_API_URL || defaultApi
+      await fetch(`${apiUrl}/api/candidate-auth/record-attempt`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: user?.email })
+      })
+    } catch (e) {
+      // ignore
+    }
+
+    // Try posting to assessment evaluation endpoint if reachable
     try {
       await fetch('/api/assessment/submit', {
         method: 'POST',

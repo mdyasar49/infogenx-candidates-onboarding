@@ -93,6 +93,7 @@ function AdminOfferReviewPage() {
       name: u.name || '',
       email: u.email || '',
       role: u.role || 'candidate',
+      assessment_attempts: u.assessment_attempts !== undefined ? u.assessment_attempts : 0,
       mobile: u.mobile || '',
       location: u.location || '',
       qualification: u.qualification || '',
@@ -501,6 +502,7 @@ function AdminOfferReviewPage() {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Assigned Role</th>
+                        <th>Test Attempts</th>
                         <th>Mobile</th>
                         <th>Location</th>
                         <th>Qualification</th>
@@ -534,6 +536,15 @@ function AdminOfferReviewPage() {
                               }}>
                                 {u.role === 'test_user' ? '🧪 Test User (Unlimited)' : u.role.toUpperCase()}
                               </span>
+                            </td>
+                            <td>
+                              {u.role === 'test_user' ? (
+                                <span style={{ color: '#E65525', fontWeight: '700' }}>Unlimited 🧪 ({u.assessment_attempts || 0} taken)</span>
+                              ) : (
+                                <span style={{ fontWeight: '700', color: (u.assessment_attempts || 0) >= 1 ? '#DC2626' : '#16A34A' }}>
+                                  {(u.assessment_attempts || 0) >= 1 ? '1 / 1 (Exhausted)' : '0 / 1 (Available)'}
+                                </span>
+                              )}
                             </td>
                             <td>{u.mobile || '—'}</td>
                             <td>{u.location || '—'}</td>
@@ -723,6 +734,19 @@ function AdminOfferReviewPage() {
                           style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
                         />
                       </div>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>
+                        Test Attempts Completed (Candidates allowed 1 attempt; change to 0 to grant re-test)
+                      </label>
+                      <input
+                        type="number"
+                        min="0"
+                        value={userForm.assessment_attempts}
+                        onChange={(e) => setUserForm({ ...userForm, assessment_attempts: parseInt(e.target.value, 10) || 0 })}
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
+                      />
                     </div>
 
                     <div>
