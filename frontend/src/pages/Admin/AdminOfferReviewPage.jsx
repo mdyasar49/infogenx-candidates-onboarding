@@ -188,6 +188,35 @@ function AdminOfferReviewPage() {
               </div>
             </div>
 
+            {/* Candidate Questionnaire Breakdown Card */}
+            <div style={{
+              background: '#FFFFFF',
+              borderRadius: '12px',
+              padding: '24px',
+              marginBottom: '24px',
+              border: '1px solid #E2E8F0',
+              boxShadow: '0 2px 8px rgba(0, 18, 60, 0.04)'
+            }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#00123C', margin: '0 0 16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <span>📋</span> Candidate Questionnaire & Work Preferences
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '14px', fontSize: '13.5px' }}>
+                <div><strong>Phone / WhatsApp:</strong> <span style={{ color: '#334155' }}>{candidateData.phone || 'N/A'}</span></div>
+                <div><strong>Location:</strong> <span style={{ color: '#334155' }}>{candidateData.location || 'N/A'}</span></div>
+                <div><strong>Experience:</strong> <span style={{ color: '#334155' }}>{candidateData.experience || 'Fresher'}</span></div>
+                <div><strong>Qualification:</strong> <span style={{ color: '#334155' }}>{candidateData.qualification || 'N/A'}</span></div>
+                <div><strong>Certification:</strong> <span style={{ color: '#334155' }}>{candidateData.certification || 'None'}</span></div>
+                <div><strong>Work Status:</strong> <span style={{ color: '#334155' }}>{candidateData.workStatus || 'Not working'}</span></div>
+                <div><strong>Work Mode:</strong> <span style={{ color: '#334155' }}>{candidateData.workMode || 'WFH / Flexible'}</span></div>
+                <div><strong>Work Duration & Timings:</strong> <span style={{ color: '#334155' }}>{candidateData.workTimings || 'Full Time / Flexible'}</span></div>
+                <div><strong>Start Date:</strong> <span style={{ color: '#334155' }}>{candidateData.startDate || 'Immediate'}</span></div>
+                <div><strong>Current Salary / Rate:</strong> <span style={{ color: '#334155' }}>{candidateData.currentSalary || 'N/A'}</span></div>
+                <div style={{ gridColumn: '1 / -1' }}><strong>Preferred Availability:</strong> <span style={{ color: '#334155' }}>{candidateData.availability || 'Flexible'}</span></div>
+                <div><strong>LinkedIn Profile:</strong> {candidateData.linkedin ? <a href={candidateData.linkedin} target="_blank" rel="noreferrer" style={{ color: '#E65525', fontWeight: '600' }}>{candidateData.linkedin} ↗</a> : <span style={{ color: '#64748B' }}>N/A</span>}</div>
+                <div><strong>Resume Link:</strong> {candidateData.resumeLink ? <a href={candidateData.resumeLink} target="_blank" rel="noreferrer" style={{ color: '#000E68', fontWeight: '600' }}>Open Google Drive Resume ↗</a> : <span style={{ color: '#64748B' }}>N/A</span>}</div>
+              </div>
+            </div>
+
             {/* Approval & Customization Form */}
             <div className="approval-form-card">
               <h3 className="form-section-title">
