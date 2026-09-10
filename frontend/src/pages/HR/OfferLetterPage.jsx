@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import ProgressSidebar from '../../components/ProgressSidebar'
-import TopHeader from '../../components/TopHeader'
 import { useAuth } from '../../hooks/useAuth'
 import { onboardingWorkflow } from '../../services/authService'
 import './OfferLetterPage.css'
@@ -19,8 +18,6 @@ function OfferLetterPage() {
       <ProgressSidebar steps={steps} />
 
       <main className="offer-main">
-        {user && <TopHeader profile={user} />}
-
         <div className="offer-card">
           <div className="offer-header">
             <h2>Selection, Offer <span className="heading-accent">& Compensation Framework</span></h2>

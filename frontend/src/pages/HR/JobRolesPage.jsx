@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ProgressSidebar from '../../components/ProgressSidebar'
-import TopHeader from '../../components/TopHeader'
 import { useAuth } from '../../hooks/useAuth'
 import { onboardingWorkflow } from '../../services/authService'
 import './JobRolesPage.css'
@@ -55,8 +54,6 @@ function JobRolesPage() {
       <ProgressSidebar steps={steps} />
 
       <main className="roles-main">
-        {user && <TopHeader profile={user} />}
-
         <div className="roles-card">
           <div className="roles-header">
             <h2>Job Roles <span className="heading-accent">& Tech Stack Map</span></h2>

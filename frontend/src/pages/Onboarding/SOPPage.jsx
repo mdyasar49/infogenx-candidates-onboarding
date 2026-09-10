@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import ProgressSidebar from '../../components/ProgressSidebar'
-import TopHeader from '../../components/TopHeader'
 import { useAuth } from '../../hooks/useAuth'
 import { onboardingWorkflow } from '../../services/authService'
 import './SOPPage.css'
@@ -19,8 +18,6 @@ function SOPPage() {
       <ProgressSidebar steps={steps} />
 
       <main className="sop-main">
-        {user && <TopHeader profile={user} />}
-
         <section className="sop-welcome-banner">
           <p className="sop-tagline">Infogenx Pvt. Ltd. · Digital Transformation</p>
           <h2>Welcome to Infogenx <span className="heading-accent">Student Onboarding</span></h2>

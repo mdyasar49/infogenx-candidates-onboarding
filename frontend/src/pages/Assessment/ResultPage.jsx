@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import TopHeader from '../../components/TopHeader'
 import { useAuth } from '../../hooks/useAuth'
 import './ResultPage.css'
 
@@ -44,10 +43,8 @@ function ResultPage() {
   const percentage = result ? result.percentage : 0
 
   return (
-    <div className="result-shell" style={{ background: '#FFFFFF', minHeight: '100vh', padding: '24px 20px' }}>
+    <div className="result-shell" style={{ background: '#FFFFFF', minHeight: 'calc(100vh - 100px)', padding: '0 20px 32px 20px' }}>
       <main className="result-main" style={{ maxWidth: '900px', margin: '0 auto' }}>
-        {user && <TopHeader profile={user} />}
-
         <div className="result-card" style={{
           background: '#FFFFFF',
           borderRadius: '20px',

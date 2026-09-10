@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import ProgressSidebar from '../../components/ProgressSidebar'
-import TopHeader from '../../components/TopHeader'
 import { useAuth } from '../../hooks/useAuth'
 import { onboardingWorkflow } from '../../services/authService'
 import './RecruitmentProcessPage.css'
@@ -19,8 +18,6 @@ function RecruitmentProcessPage() {
       <ProgressSidebar steps={steps} />
 
       <main className="process-main">
-        {user && <TopHeader profile={user} />}
-
         <div className="process-card">
           <div className="process-header">
             <h2>Recruitment Process <span className="heading-accent">& Sourcing Overview</span></h2>

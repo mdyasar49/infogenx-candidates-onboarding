@@ -1,6 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import TopHeader from '../../components/TopHeader'
 import { useAuth } from '../../hooks/useAuth'
 import headerImg from '../../assets/offer/infogenx_header.jpeg'
 import directorSigImg from '../../assets/offer/director_signature.jpeg'
@@ -262,9 +261,6 @@ function OfferLetterView() {
 
   return (
     <div className="offer-letter-view-container">
-      <div className="no-print" style={{ maxWidth: '850px', margin: '0 auto 20px auto' }}>
-        {user && <TopHeader profile={user} />}
-      </div>
 
       {/* Top Action Bar (hidden during printing) */}
       <div className="offer-actions-bar no-print">

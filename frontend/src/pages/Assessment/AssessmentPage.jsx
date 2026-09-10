@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import TopHeader from '../../components/TopHeader'
 import { useAuth } from '../../hooks/useAuth'
 import { questionBank } from '../../../../backend/services/questions.js'
 import './AssessmentPage.css'
@@ -106,10 +105,8 @@ function AssessmentPage() {
   const answeredCount = Object.keys(userAnswers).length
 
   return (
-    <div className="assessment-shell" style={{ background: '#FFFFFF', minHeight: '100vh', padding: '24px 20px' }}>
+    <div className="assessment-shell" style={{ background: '#FFFFFF', minHeight: 'calc(100vh - 100px)', padding: '0 20px 32px 20px' }}>
       <main className="assessment-main" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        {user && <TopHeader profile={user} />}
-
         <div className="assessment-card" style={{
           background: '#FFFFFF',
           borderRadius: '20px',

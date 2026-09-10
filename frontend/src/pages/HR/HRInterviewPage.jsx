@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import ProgressSidebar from '../../components/ProgressSidebar'
-import TopHeader from '../../components/TopHeader'
 import { useAuth } from '../../hooks/useAuth'
 import { onboardingWorkflow } from '../../services/authService'
 import './HRInterviewPage.css'
@@ -19,8 +18,6 @@ function HRInterviewPage() {
       <ProgressSidebar steps={steps} />
 
       <main className="hr-main">
-        {user && <TopHeader profile={user} />}
-
         <div className="hr-card">
           <div className="hr-header">
             <h2>HR & Leadership <span className="heading-accent">Interview (Round 2)</span></h2>

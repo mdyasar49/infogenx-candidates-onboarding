@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import ProgressSidebar from '../../components/ProgressSidebar'
-import TopHeader from '../../components/TopHeader'
 import { useAuth } from '../../hooks/useAuth'
 import { onboardingWorkflow } from '../../services/authService'
 import './DashboardPage.css'
@@ -47,7 +46,6 @@ function DashboardPage() {
       <ProgressSidebar steps={steps} />
 
       <main className="dashboard-main">
-        <TopHeader profile={user} />
 
         <section className="dashboard-welcome">
           <h2>Onboarding <span className="heading-accent">Progress</span></h2>

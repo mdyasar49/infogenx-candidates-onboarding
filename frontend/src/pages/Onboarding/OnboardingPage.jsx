@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ProgressSidebar from '../../components/ProgressSidebar'
-import TopHeader from '../../components/TopHeader'
 import { useAuth } from '../../hooks/useAuth'
 import { onboardingWorkflow } from '../../services/authService'
 import './OnboardingPage.css'
@@ -30,8 +29,6 @@ function OnboardingPage() {
       <ProgressSidebar steps={steps} />
 
       <main className="onboard-main">
-        {user && <TopHeader profile={user} />}
-
         <div className="onboard-card">
           <div className="onboard-header">
             <h2>Onboarding <span className="heading-accent">& Compliance Protocol</span></h2>

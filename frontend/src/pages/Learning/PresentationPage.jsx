@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom'
-import TopHeader from '../../components/TopHeader'
 import { useAuth } from '../../hooks/useAuth'
 import './PresentationPage.css'
 
@@ -8,10 +7,8 @@ function PresentationPage() {
   const navigate = useNavigate()
 
   return (
-    <div className="presentation-shell" style={{ background: '#FFFFFF', minHeight: '100vh', padding: '24px 20px' }}>
+    <div className="presentation-shell" style={{ background: '#FFFFFF', minHeight: 'calc(100vh - 100px)', padding: '0 20px 32px 20px' }}>
       <main className="presentation-main" style={{ maxWidth: '1000px', margin: '0 auto' }}>
-        {user && <TopHeader profile={user} />}
-
         <div className="presentation-card" style={{
           background: '#FFFFFF',
           borderRadius: '20px',
