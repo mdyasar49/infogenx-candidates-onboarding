@@ -84,8 +84,10 @@ function ResultPage() {
     }))
   }
 
+  const isTestUser = user?.role === 'test_user' || user?.role === 'test'
+
   const handleReattempt = () => {
-    if (attemptNumber >= 3) return
+    if (!isTestUser && attemptNumber >= 3) return
     const nextAttempt = attemptNumber + 1
     if (user?.email) {
       sessionStorage.setItem(`infogenx_attempt_count_${user.email}`, nextAttempt.toString())
@@ -244,7 +246,9 @@ function ResultPage() {
 
                 <div style={{ background: '#FFF8F3', border: '1px solid rgba(0, 18, 60, 0.08)', borderRadius: '14px', padding: '16px', textAlign: 'center' }}>
                   <span style={{ fontSize: '12px', color: '#5C6A86', fontWeight: '700', textTransform: 'uppercase' }}>Attempt Recorded</span>
-                  <p style={{ fontSize: '18px', fontWeight: '800', color: '#00123C', margin: '4px 0 0' }}>Attempt {attemptNumber} of 3</p>
+                  <p style={{ fontSize: '18px', fontWeight: '800', color: isTestUser ? '#E65525' : '#00123C', margin: '4px 0 0' }}>
+                    {isTestUser ? `Attempt ${attemptNumber} (Unlimited 🧪)` : `Attempt ${attemptNumber} of 3`}
+                  </p>
                 </div>
 
                 <div style={{ background: '#FFF8F3', border: '1px solid rgba(0, 18, 60, 0.08)', borderRadius: '14px', padding: '16px', textAlign: 'center' }}>
@@ -619,10 +623,16 @@ function ResultPage() {
                 </div>
               ) : (
                 <div style={{ width: '100%', textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  {attemptNumber < 3 ? (
+                  {attemptNumber < 3 || isTestUser ? (
                     <>
                       <p style={{ fontSize: '15px', color: '#00123C', margin: 0 }}>
-                        You require 80% (40/50) to pass. You have {3 - attemptNumber} reattempt(s) remaining.
+                        {isTestUser ? (
+                          <span style={{ color: '#E65525', fontWeight: '700' }}>
+                            🧪 Unlimited Test Mode Active: You can reattempt this assessment without restrictions.
+                          </span>
+                        ) : (
+                          `You require 80% (40/50) to pass. You have ${3 - attemptNumber} reattempt(s) remaining.`
+                        )}
                       </p>
                       <div>
                         <button
@@ -640,7 +650,7 @@ function ResultPage() {
                             boxShadow: '0 10px 24px rgba(230, 85, 37, 0.2)'
                           }}
                         >
-                          Reattempt Assessment ↺
+                          {isTestUser ? 'Reattempt Assessment (Unlimited Test Mode) ↺' : 'Reattempt Assessment ↺'}
                         </button>
                       </div>
                     </>

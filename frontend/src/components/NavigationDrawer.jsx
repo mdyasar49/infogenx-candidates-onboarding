@@ -37,9 +37,16 @@ function NavigationDrawer({ isOpen, onClose }) {
 
   const candidateName = user?.name || user?.email?.split('@')[0] || 'Candidate'
   const candidateInitial = candidateName.charAt(0).toUpperCase()
+  const isAdmin = user?.role === 'admin'
+  const isTestUser = user?.role === 'test_user' || user?.role === 'test'
+
+  const roleLabel = isAdmin 
+    ? '🛡️ System Administrator' 
+    : (isTestUser ? '🧪 Test User (Unlimited)' : 'Candidate / Student')
+
   const candidateRole = user?.department
     ? `${user.department} Specialist`
-    : (user?.role || 'Candidate')
+    : roleLabel
 
   // Check assessment result
   let hasPassed = false
@@ -56,6 +63,12 @@ function NavigationDrawer({ isOpen, onClose }) {
   }
 
   const menuSections = [
+    ...(isAdmin ? [{
+      title: 'Administrator Console (cPanel DB)',
+      items: [
+        { path: '/admin/offer-review', icon: 'admin_panel_settings', label: 'Monitor All & Edit Users', badge: 'Admin', badgeColor: 'error' },
+      ],
+    }] : []),
     {
       title: 'Core 6-Step Pipeline',
       items: [

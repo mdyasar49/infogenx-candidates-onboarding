@@ -18,6 +18,16 @@ function AdminOfferReviewPage() {
   // Candidate and offer details
   const [candidateData, setCandidateData] = useState(null)
   const [allRequests, setAllRequests] = useState([])
+  const [allUsers, setAllUsers] = useState([])
+  const [summary, setSummary] = useState(null)
+  const [activeTab, setActiveTab] = useState('directory') // 'directory' | 'offers'
+  const [userSearch, setUserSearch] = useState('')
+
+  // Edit user modal state
+  const [editingUser, setEditingUser] = useState(null)
+  const [userForm, setUserForm] = useState({ name: '', email: '', role: 'candidate', mobile: '', location: '', qualification: '', password: '' })
+  const [savingUser, setSavingUser] = useState(false)
+  const [userEditMsg, setUserEditMsg] = useState(null)
 
   // Form states
   const [selectedRoleKey, setSelectedRoleKey] = useState('bde')
@@ -29,44 +39,96 @@ function AdminOfferReviewPage() {
   const defaultApi = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://api.infogenx.com'
   const apiUrl = import.meta.env.VITE_API_URL || defaultApi
 
-  // Fetch offer details by token or fetch all requests
-  useEffect(() => {
-    async function loadData() {
-      setLoading(true)
-      setError(null)
-      try {
-        if (token) {
-          const res = await fetch(`${apiUrl}/api/offer-letter/review/${token}`)
-          const data = await res.json()
-          if (data.success && data.offer) {
-            setCandidateData(data.offer)
-            const roleKey = detectRoleKey(data.offer.role || data.offer.department)
-            setSelectedRoleKey(roleKey)
-            const roleCfg = ROLE_OFFER_CONFIGS[roleKey] || ROLE_OFFER_CONFIGS['bde']
-            setDepartment(data.offer.department || roleCfg.department)
-            setSalary(data.offer.salary || roleCfg.defaultSalary)
-            setStartDate(data.offer.startDate || '')
-            setAdminNotes(data.offer.adminNotes || '')
-          } else {
-            setError(data.message || 'Unable to retrieve candidate offer details.')
-          }
+  const loadData = async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      if (token) {
+        const res = await fetch(`${apiUrl}/api/offer-letter/review/${token}`)
+        const data = await res.json()
+        if (data.success && data.offer) {
+          setCandidateData(data.offer)
+          const roleKey = detectRoleKey(data.offer.role || data.offer.department)
+          setSelectedRoleKey(roleKey)
+          const roleCfg = ROLE_OFFER_CONFIGS[roleKey] || ROLE_OFFER_CONFIGS['bde']
+          setDepartment(data.offer.department || roleCfg.department)
+          setSalary(data.offer.salary || roleCfg.defaultSalary)
+          setStartDate(data.offer.startDate || '')
+          setAdminNotes(data.offer.adminNotes || '')
         } else {
-          // No token provided - load all candidate requests for admin overview
-          const res = await fetch(`${apiUrl}/api/offer-letter/all-requests`)
-          const data = await res.json()
-          if (data.success) {
-            setAllRequests(data.requests || [])
+          setError(data.message || 'Unable to retrieve candidate offer details.')
+        }
+      } else {
+        // Fetch monitor-all data from cPanel MySQL API
+        const res = await fetch(`${apiUrl}/api/candidate-auth/monitor-all`)
+        const data = await res.json()
+        if (data.success) {
+          setAllUsers(data.users || [])
+          setAllRequests(data.offers || [])
+          setSummary(data.summary || null)
+        } else {
+          // Fallback to all-requests
+          const fallbackRes = await fetch(`${apiUrl}/api/offer-letter/all-requests`)
+          const fallbackData = await fallbackRes.json()
+          if (fallbackData.success) {
+            setAllRequests(fallbackData.requests || [])
           }
         }
-      } catch (err) {
-        setError(`Failed to connect to backend: ${err.message}`)
-      } finally {
-        setLoading(false)
       }
+    } catch (err) {
+      setError(`Failed to connect to backend: ${err.message}`)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  // Fetch offer details by token or fetch all requests
+  useEffect(() => {
     loadData()
   }, [token, apiUrl])
+
+  const handleOpenEditUser = (u) => {
+    setEditingUser(u)
+    setUserForm({
+      name: u.name || '',
+      email: u.email || '',
+      role: u.role || 'candidate',
+      mobile: u.mobile || '',
+      location: u.location || '',
+      qualification: u.qualification || '',
+      password: ''
+    })
+    setUserEditMsg(null)
+  }
+
+  const handleSaveUser = async (e) => {
+    e.preventDefault()
+    if (!editingUser) return
+    setSavingUser(true)
+    setUserEditMsg(null)
+    try {
+      const res = await fetch(`${apiUrl}/api/candidate-auth/users/${editingUser.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(userForm)
+      })
+      const data = await res.json()
+      if (data.success) {
+        setUserEditMsg({ type: 'success', text: '✓ User details & role updated in cPanel DB!' })
+        // Refresh users list
+        await loadData()
+        setTimeout(() => {
+          setEditingUser(null)
+        }, 1200)
+      } else {
+        setUserEditMsg({ type: 'error', text: data.message || 'Failed to update user.' })
+      }
+    } catch (err) {
+      setUserEditMsg({ type: 'error', text: `Network error: ${err.message}` })
+    } finally {
+      setSavingUser(false)
+    }
+  }
 
   // Handle Role Track Dropdown change
   const handleRoleChange = (e) => {
@@ -337,57 +399,383 @@ function AdminOfferReviewPage() {
           </>
         )}
 
-        {/* Overview Mode: Table of All Requests (When no specific token is provided) */}
+        {/* Overview Mode: Directory & Requests (When no specific token is provided) */}
         {!loading && !candidateData && (
-          <div className="admin-table-card">
-            <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#00123C' }}>
-              📋 Candidate Offer Letter Queue
-            </h3>
-            {allRequests.length === 0 ? (
-              <p style={{ color: '#64748b', textAlign: 'center', padding: '40px 0' }}>
-                No candidate offer requests found in database.
-              </p>
-            ) : (
-              <table className="requests-table">
-                <thead>
-                  <tr>
-                    <th>ID</th>
-                    <th>Candidate</th>
-                    <th>Email</th>
-                    <th>Score</th>
-                    <th>Assigned Role</th>
-                    <th>Salary</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {allRequests.map((req) => (
-                    <tr key={req.id}>
-                      <td>#{req.id}</td>
-                      <td><strong>{req.candidate_name}</strong></td>
-                      <td>{req.candidate_email}</td>
-                      <td>{req.assessment_score}</td>
-                      <td>{req.role}</td>
-                      <td>{req.salary}</td>
-                      <td>
-                        <span className={`badge-status ${req.status === 'APPROVED' ? 'approved' : 'pending'}`}>
-                          {req.status}
-                        </span>
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn-review-action"
-                          onClick={() => navigate(`/admin/offer-review?token=${req.token}`)}
-                        >
-                          Review &amp; Edit →
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+          <div>
+            {/* Summary KPI Cards */}
+            {summary && (
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+                gap: '16px',
+                marginBottom: '24px'
+              }}>
+                <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '18px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0, 18, 60, 0.04)', textAlign: 'center' }}>
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#64748B', textTransform: 'uppercase' }}>Total Registered</span>
+                  <p style={{ fontSize: '26px', fontWeight: '800', color: '#00123C', margin: '4px 0 0' }}>{summary.totalUsers}</p>
+                </div>
+                <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '18px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0, 18, 60, 0.04)', textAlign: 'center' }}>
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#2563EB', textTransform: 'uppercase' }}>Candidates / Students</span>
+                  <p style={{ fontSize: '26px', fontWeight: '800', color: '#2563EB', margin: '4px 0 0' }}>{summary.candidatesCount}</p>
+                </div>
+                <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '18px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0, 18, 60, 0.04)', textAlign: 'center' }}>
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#E65525', textTransform: 'uppercase' }}>Test Users (Unlimited 🧪)</span>
+                  <p style={{ fontSize: '26px', fontWeight: '800', color: '#E65525', margin: '4px 0 0' }}>{summary.testUsersCount}</p>
+                </div>
+                <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '18px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0, 18, 60, 0.04)', textAlign: 'center' }}>
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#7C3AED', textTransform: 'uppercase' }}>System Admins 🛡️</span>
+                  <p style={{ fontSize: '26px', fontWeight: '800', color: '#7C3AED', margin: '4px 0 0' }}>{summary.adminsCount}</p>
+                </div>
+                <div style={{ background: '#FFFFFF', borderRadius: '12px', padding: '18px', border: '1px solid #E2E8F0', boxShadow: '0 2px 8px rgba(0, 18, 60, 0.04)', textAlign: 'center' }}>
+                  <span style={{ fontSize: '12px', fontWeight: '700', color: '#16A34A', textTransform: 'uppercase' }}>Pending Offers</span>
+                  <p style={{ fontSize: '26px', fontWeight: '800', color: '#D97706', margin: '4px 0 0' }}>{summary.pendingApprovals}</p>
+                </div>
+              </div>
+            )}
+
+            {/* Navigation Tabs */}
+            <div style={{ display: 'flex', gap: '12px', marginBottom: '20px' }}>
+              <button
+                type="button"
+                onClick={() => setActiveTab('directory')}
+                style={{
+                  padding: '12px 24px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: activeTab === 'directory' ? 'linear-gradient(90deg, #00123C 0%, #E65525 100%)' : '#FFFFFF',
+                  color: activeTab === 'directory' ? '#FFFFFF' : '#00123C',
+                  fontWeight: '700',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  boxShadow: activeTab === 'directory' ? '0 4px 14px rgba(230, 85, 37, 0.25)' : '0 1px 3px rgba(0,0,0,0.06)'
+                }}
+              >
+                👥 Candidate Directory &amp; Role Management ({allUsers.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setActiveTab('offers')}
+                style={{
+                  padding: '12px 24px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  background: activeTab === 'offers' ? 'linear-gradient(90deg, #00123C 0%, #E65525 100%)' : '#FFFFFF',
+                  color: activeTab === 'offers' ? '#FFFFFF' : '#00123C',
+                  fontWeight: '700',
+                  fontSize: '14px',
+                  cursor: 'pointer',
+                  boxShadow: activeTab === 'offers' ? '0 4px 14px rgba(230, 85, 37, 0.25)' : '0 1px 3px rgba(0,0,0,0.06)'
+                }}
+              >
+                📋 Offer Letter Queue ({allRequests.length})
+              </button>
+            </div>
+
+            {/* TAB 1: Candidates & Users Directory */}
+            {activeTab === 'directory' && (
+              <div className="admin-table-card">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px', flexWrap: 'wrap', gap: '12px' }}>
+                  <h3 style={{ margin: 0, fontSize: '18px', color: '#00123C' }}>
+                    👥 Registered Candidate Users (MySQL cPanel DB: <code style={{ color: '#E65525' }}>infogenxblog</code>)
+                  </h3>
+                  <input
+                    type="text"
+                    placeholder="Search candidate name, email, or role..."
+                    value={userSearch}
+                    onChange={(e) => setUserSearch(e.target.value)}
+                    style={{
+                      padding: '8px 16px',
+                      borderRadius: '8px',
+                      border: '1px solid #CBD5E1',
+                      fontSize: '13.5px',
+                      width: '280px'
+                    }}
+                  />
+                </div>
+
+                <div style={{ overflowX: 'auto' }}>
+                  <table className="requests-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Assigned Role</th>
+                        <th>Mobile</th>
+                        <th>Location</th>
+                        <th>Qualification</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allUsers
+                        .filter((u) => {
+                          const query = userSearch.toLowerCase()
+                          return (
+                            (u.name || '').toLowerCase().includes(query) ||
+                            (u.email || '').toLowerCase().includes(query) ||
+                            (u.role || '').toLowerCase().includes(query)
+                          )
+                        })
+                        .map((u) => (
+                          <tr key={u.id}>
+                            <td>#{u.id}</td>
+                            <td><strong>{u.name}</strong></td>
+                            <td>{u.email}</td>
+                            <td>
+                              <span style={{
+                                padding: '4px 10px',
+                                borderRadius: '12px',
+                                fontSize: '12px',
+                                fontWeight: '700',
+                                background: u.role === 'admin' ? '#F3E8FF' : (u.role === 'test_user' ? '#FFF7ED' : '#EFF6FF'),
+                                color: u.role === 'admin' ? '#7E22CE' : (u.role === 'test_user' ? '#C2410C' : '#1D4ED8'),
+                                border: u.role === 'test_user' ? '1px solid #FDBA74' : 'none'
+                              }}>
+                                {u.role === 'test_user' ? '🧪 Test User (Unlimited)' : u.role.toUpperCase()}
+                              </span>
+                            </td>
+                            <td>{u.mobile || '—'}</td>
+                            <td>{u.location || '—'}</td>
+                            <td>{u.qualification || '—'}</td>
+                            <td>
+                              <button
+                                type="button"
+                                className="btn-review-action"
+                                onClick={() => handleOpenEditUser(u)}
+                                style={{ background: '#00123C', padding: '6px 14px' }}
+                              >
+                                Edit ✏️
+                              </button>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+
+            {/* TAB 2: Offer Requests Queue */}
+            {activeTab === 'offers' && (
+              <div className="admin-table-card">
+                <h3 style={{ margin: '0 0 16px 0', fontSize: '18px', color: '#00123C' }}>
+                  📋 Candidate Offer Letter Queue
+                </h3>
+                {allRequests.length === 0 ? (
+                  <p style={{ color: '#64748b', textAlign: 'center', padding: '40px 0' }}>
+                    No candidate offer requests found in database.
+                  </p>
+                ) : (
+                  <table className="requests-table">
+                    <thead>
+                      <tr>
+                        <th>ID</th>
+                        <th>Candidate</th>
+                        <th>Email</th>
+                        <th>Score</th>
+                        <th>Assigned Role</th>
+                        <th>Salary</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {allRequests.map((req) => (
+                        <tr key={req.id}>
+                          <td>#{req.id}</td>
+                          <td><strong>{req.candidate_name}</strong></td>
+                          <td>{req.candidate_email}</td>
+                          <td>{req.assessment_score}</td>
+                          <td>{req.role}</td>
+                          <td>{req.salary}</td>
+                          <td>
+                            <span className={`badge-status ${req.status === 'APPROVED' ? 'approved' : 'pending'}`}>
+                              {req.status}
+                            </span>
+                          </td>
+                          <td>
+                            <button
+                              type="button"
+                              className="btn-review-action"
+                              onClick={() => navigate(`/admin/offer-review?token=${req.token}`)}
+                            >
+                              Review &amp; Edit →
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+            )}
+
+            {/* Edit User Modal Dialog */}
+            {editingUser && (
+              <div style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                width: '100vw',
+                height: '100vh',
+                background: 'rgba(0, 18, 60, 0.65)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 9999,
+                padding: '20px'
+              }}>
+                <div style={{
+                  background: '#FFFFFF',
+                  borderRadius: '16px',
+                  width: '100%',
+                  maxWidth: '540px',
+                  padding: '30px',
+                  boxShadow: '0 20px 60px rgba(0,0,0,0.3)',
+                  border: '1px solid #CBD5E1'
+                }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '18px' }}>
+                    <h3 style={{ margin: 0, color: '#00123C', fontSize: '20px', fontWeight: '800' }}>
+                      ✏️ Edit User Details &amp; Role
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setEditingUser(null)}
+                      style={{ background: 'none', border: 'none', fontSize: '20px', cursor: 'pointer', color: '#64748B' }}
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {userEditMsg && (
+                    <div style={{
+                      padding: '12px 16px',
+                      borderRadius: '8px',
+                      marginBottom: '16px',
+                      fontSize: '13.5px',
+                      fontWeight: '700',
+                      background: userEditMsg.type === 'success' ? '#F0FDF4' : '#FEF2F2',
+                      color: userEditMsg.type === 'success' ? '#15803D' : '#991B1B',
+                      border: userEditMsg.type === 'success' ? '1px solid #86EFAC' : '1px solid #FCA5A5'
+                    }}>
+                      {userEditMsg.text}
+                    </div>
+                  )}
+
+                  <form onSubmit={handleSaveUser} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>Full Name</label>
+                      <input
+                        type="text"
+                        required
+                        value={userForm.name}
+                        onChange={(e) => setUserForm({ ...userForm, name: e.target.value })}
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>Email Address</label>
+                      <input
+                        type="email"
+                        required
+                        value={userForm.email}
+                        onChange={(e) => setUserForm({ ...userForm, email: e.target.value })}
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>
+                        Assigned User Role
+                      </label>
+                      <select
+                        value={userForm.role}
+                        onChange={(e) => setUserForm({ ...userForm, role: e.target.value })}
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1.5px solid #00123C', fontSize: '14px', fontWeight: '700', background: '#FFF8F3', boxSizing: 'border-box' }}
+                      >
+                        <option value="candidate">Candidate (Student - Standard 3 Attempts)</option>
+                        <option value="student">Student (Standard 3 Attempts)</option>
+                        <option value="test_user">Test User (🧪 Unlimited Assessment Attempts)</option>
+                        <option value="admin">Administrator (🛡️ Monitor All &amp; Edit All)</option>
+                      </select>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>Mobile / Phone</label>
+                        <input
+                          type="text"
+                          value={userForm.mobile}
+                          onChange={(e) => setUserForm({ ...userForm, mobile: e.target.value })}
+                          placeholder="+91..."
+                          style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
+                        />
+                      </div>
+                      <div>
+                        <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>Location</label>
+                        <input
+                          type="text"
+                          value={userForm.location}
+                          onChange={(e) => setUserForm({ ...userForm, location: e.target.value })}
+                          placeholder="City / State"
+                          style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>Qualification</label>
+                      <input
+                        type="text"
+                        value={userForm.qualification}
+                        onChange={(e) => setUserForm({ ...userForm, qualification: e.target.value })}
+                        placeholder="Degree / Major"
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    <div>
+                      <label style={{ display: 'block', fontSize: '12px', fontWeight: '700', color: '#334155', marginBottom: '4px' }}>
+                        Reset Password (Optional - leave blank to keep unchanged)
+                      </label>
+                      <input
+                        type="text"
+                        value={userForm.password}
+                        onChange={(e) => setUserForm({ ...userForm, password: e.target.value })}
+                        placeholder="New Password"
+                        style={{ width: '100%', padding: '10px 12px', borderRadius: '8px', border: '1px solid #CBD5E1', fontSize: '14px', boxSizing: 'border-box' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '14px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setEditingUser(null)}
+                        style={{ padding: '10px 20px', borderRadius: '8px', border: '1px solid #CBD5E1', background: '#FFFFFF', color: '#334155', fontWeight: '700', cursor: 'pointer' }}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={savingUser}
+                        style={{
+                          padding: '10px 24px',
+                          borderRadius: '8px',
+                          border: 'none',
+                          background: 'linear-gradient(90deg, #00123C 0%, #E65525 100%)',
+                          color: '#FFFFFF',
+                          fontWeight: '700',
+                          cursor: savingUser ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        {savingUser ? 'Saving Changes...' : 'Save User Changes ✓'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             )}
           </div>
         )}

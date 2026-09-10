@@ -13,8 +13,10 @@ export const INFOGENX_COLORS = {
   border: 'rgba(0, 18, 60, 0.08)',
 }
 
+const defaultApi = window.location.hostname === 'localhost' ? 'http://localhost:5000' : 'https://api.infogenx.com'
+const MYSQL_AUTH_URL = `${defaultApi}/api/candidate-auth/login`
 const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzBZ_OQKodlVo9M1bcUlBQXnZS93NxZQvJdqUIJiFf0ex6TVl-XrN0UW2sMJv8LBuyhhA/exec"
-const API_URL = import.meta.env.VITE_AUTH_API_URL || APPS_SCRIPT_URL
+const API_URL = import.meta.env.VITE_AUTH_API_URL || MYSQL_AUTH_URL
 
 // Authentication service
 class AuthService {
@@ -22,12 +24,41 @@ class AuthService {
     try {
       const normalizedEmail = (email || '').trim().toLowerCase()
 
-      // Secure Admin Authentication
-      if (normalizedEmail === 'test@infogenx.com' && password === 'test123') {
+      // 1. First attempt: Authenticate via cPanel MySQL Database API
+      try {
+        const mysqlRes = await fetch(MYSQL_AUTH_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: normalizedEmail, password })
+        })
+
+        if (mysqlRes.ok) {
+          const mysqlData = await mysqlRes.json()
+          if (mysqlData.success && mysqlData.student) {
+            const sessionData = {
+              ...mysqlData.student,
+              loggedIn: true,
+              loginTime: new Date().toISOString(),
+              onboardingProgress: {},
+            }
+            sessionStorage.setItem('infogenx_session', JSON.stringify(sessionData))
+            return {
+              success: true,
+              student: sessionData,
+            }
+          }
+        }
+      } catch (mysqlErr) {
+        console.warn('[AuthService] MySQL auth fallback:', mysqlErr.message)
+      }
+
+      // 2. Built-in Admin & Test User Credentials fallback
+      if ((normalizedEmail === 'test@infogenx.com' && password === 'test123') ||
+          (normalizedEmail === 'admin@infogenx.com' && password === 'India-1234')) {
         const adminSession = {
           name: 'Infogenx Administrator',
-          email: 'test@infogenx.com',
-          role: 'ADMIN',
+          email: normalizedEmail,
+          role: 'admin',
           loggedIn: true,
           loginTime: new Date().toISOString(),
           onboardingProgress: {},
@@ -39,24 +70,36 @@ class AuthService {
         }
       }
 
-      const isAppsScript = API_URL.includes('script.google.com')
+      if (normalizedEmail === 'tester@infogenx.com' && password === 'testuser123') {
+        const testSession = {
+          name: 'QA Test User (Unlimited Attempts)',
+          email: 'tester@infogenx.com',
+          role: 'test_user',
+          loggedIn: true,
+          loginTime: new Date().toISOString(),
+          onboardingProgress: {},
+        }
+        sessionStorage.setItem('infogenx_session', JSON.stringify(testSession))
+        return {
+          success: true,
+          student: testSession,
+        }
+      }
+
+      // 3. Fallback: Google Apps Script legacy authentication
+      const isAppsScript = APPS_SCRIPT_URL.includes('script.google.com')
       const options = {
         method: "POST",
-        headers: isAppsScript
-          ? { "Content-Type": "text/plain;charset=utf-8" }
-          : { "Content-Type": "application/json" },
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
           action: "login",
           email: normalizedEmail,
           password,
         }),
+        redirect: "follow"
       }
 
-      if (isAppsScript) {
-        options.redirect = "follow"
-      }
-
-      const response = await fetch(API_URL, options)
+      const response = await fetch(APPS_SCRIPT_URL, options)
       const result = await response.json()
 
       if (result && result.success) {

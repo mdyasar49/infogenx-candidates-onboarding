@@ -13,6 +13,7 @@ function AssessmentPage() {
   const [userAnswers, setUserAnswers] = useState({})
   const [submitting, setSubmitting] = useState(false)
   const [attemptCount, setAttemptCount] = useState(1)
+  const isTestUser = user?.role === 'test_user' || user?.role === 'test'
 
   const questions = questionBank
 
@@ -156,8 +157,10 @@ function AssessmentPage() {
                   <span style={{ fontSize: '13px', color: '#5C6A86', fontWeight: '600' }}>Minimum 40/50 Marks Required</span>
                 </div>
                 <div style={{ padding: '12px', borderLeft: '1px solid rgba(0, 18, 60, 0.08)' }}>
-                  <span style={{ fontSize: '28px', fontWeight: '800', color: '#00123C', display: 'block' }}>Attempt #{attemptCount}</span>
-                  <span style={{ fontSize: '13px', color: '#5C6A86', fontWeight: '600' }}>Maximum 3 Attempts Allowed</span>
+                  <span style={{ fontSize: '28px', fontWeight: '800', color: isTestUser ? '#E65525' : '#00123C', display: 'block' }}>Attempt #{attemptCount}</span>
+                  <span style={{ fontSize: '13px', color: isTestUser ? '#E65525' : '#5C6A86', fontWeight: isTestUser ? '700' : '600' }}>
+                    {isTestUser ? '🧪 Unlimited Attempts (Test Mode)' : 'Maximum 3 Attempts Allowed'}
+                  </span>
                 </div>
               </div>
 
@@ -202,7 +205,7 @@ function AssessmentPage() {
                     Question {currentQIndex + 1} <span style={{ color: '#E65525' }}>of {questions.length}</span>
                   </h2>
                   <p style={{ margin: 0, fontSize: '13px', color: '#5C6A86' }}>
-                    Attempt #{attemptCount} | Answered: {answeredCount} / {questions.length}
+                    Attempt #{attemptCount} {isTestUser ? '(Unlimited 🧪)' : ''} | Answered: {answeredCount} / {questions.length}
                   </p>
                 </div>
                 <div style={{
