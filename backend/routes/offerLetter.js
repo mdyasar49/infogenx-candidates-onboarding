@@ -46,10 +46,15 @@ router.post("/send-email", async (req, res) => {
       candidateName,
       candidateEmail,
       role = "Business Development Executive",
+      department = "Business Development & Client Relations",
       salary = "₹30,000 per month",
       signatureDataUrl,
       pdfBase64,
-      startDate
+      startDate,
+      openingStatement,
+      incentiveDescription,
+      targets,
+      reportingTools
     } = req.body;
 
     if (!candidateEmail || !candidateName) {
@@ -61,6 +66,20 @@ router.post("/send-email", async (req, res) => {
 
     const todayStr = getFormattedDate();
     const formattedStartDate = startDate || getFormattedDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000));
+
+    const defaultOpening = `Based on your technical proficiency, aptitude, and outstanding performance in our technical assessment, we believe you will be a valuable asset to our global operations.`;
+    const resolvedOpening = openingStatement || defaultOpening;
+    const resolvedIncentive = incentiveDescription || `You are eligible for a Performance-Linked Incentive (PLI) for every milestone successfully completed. The incentive is calculated based on milestone delivery, quality metrics, and profitability.`;
+    const resolvedReporting = reportingTools || `the company's designated tracking systems (Google Sheets / Zoho CRM / Git Repositories)`;
+
+    let targetsHtml = `
+      <li><strong>Initial Target:</strong> Consistent output and adherence to project deliverables within your first month.</li>
+      <li><strong>Contract Continuity:</strong> This offer is performance-linked. Maintaining quality output and proactive communication is required to ensure contract continuity.</li>
+      <li><strong>Performance Review:</strong> A formal review will be conducted after six months. Upon satisfactory appraisal, a revision in base compensation and incentive tier will be evaluated.</li>
+    `;
+    if (Array.isArray(targets) && targets.length > 0) {
+      targetsHtml = targets.map(t => `<li><strong>${t.label}:</strong> ${t.text}</li>`).join("\n");
+    }
 
     // Paths to reference assets
     const headerPath = path.join(__dirname, "../assets/infogenx_header.jpeg");
@@ -144,8 +163,8 @@ router.post("/send-email", async (req, res) => {
     <div class="salutation">Dear ${candidateName},</div>
 
     <p>
-      We are pleased to offer you the position of <strong>${role}</strong> at <strong>Infogenx Private Limited</strong>.
-      Based on your background and outstanding performance in our technical assessment, we believe you will be a valuable asset to our global business strategy.
+      We are pleased to offer you the position of <strong>${role}</strong> in our <strong>${department}</strong> division at <strong>Infogenx Private Limited</strong>.
+      ${resolvedOpening}
     </p>
 
     <p>Your employment will be governed by the following terms and conditions:</p>
@@ -153,20 +172,18 @@ router.post("/send-email", async (req, res) => {
     <h2>1. Remuneration & Compensation</h2>
     <ul>
       <li><strong>Fixed Monthly Compensation:</strong> You will receive a consolidated gross salary of <strong>${salary}</strong>.</li>
-      <li><strong>Performance Incentives:</strong> You are eligible for a Performance-Linked Incentive (PLI) for every project successfully delivered. The incentive is calculated based on project milestones, performance metrics, and profitability.</li>
+      <li><strong>Performance Incentives:</strong> ${resolvedIncentive}</li>
       <li><strong>Payment Schedule:</strong> Salary and earned incentives will be transferred to your designated bank account during the first week of every month, following the verification of your performance reports.</li>
     </ul>
 
     <h2>2. Performance Expectations & Targets</h2>
     <ul>
-      <li><strong>Initial Target:</strong> Consistent output and adherence to project deliverables within your first month.</li>
-      <li><strong>Contract Continuity:</strong> This offer is performance-linked. Maintaining quality output and proactive communication is required to ensure contract continuity.</li>
-      <li><strong>Performance Review:</strong> A formal performance review will be conducted after six months. Upon satisfactory appraisal, a revision in base compensation and incentive tier will be evaluated.</li>
+      ${targetsHtml}
     </ul>
 
     <h2>3. Reporting & Operations</h2>
     <p>
-      As part of our data-driven approach, you are required to maintain a daily log of your activities and project statuses in the company's designated tracking systems (Google Sheets / Zoho CRM).
+      As part of our data-driven approach, you are required to maintain a daily log of your activities and project statuses in the company's designated operational systems (<strong>${resolvedReporting}</strong>).
     </p>
 
     <h2>4. Acceptance and Commencement</h2>

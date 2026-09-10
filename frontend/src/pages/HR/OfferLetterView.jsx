@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAuth } from '../../hooks/useAuth'
+import { ROLE_OFFER_CONFIGS, detectRoleKey } from '../../data/roleOfferConfigs'
 import headerImg from '../../assets/offer/infogenx_header.jpeg'
 import directorSigImg from '../../assets/offer/director_signature.jpeg'
 import './OfferLetterView.css'
@@ -21,6 +22,12 @@ function OfferLetterView() {
   const { user } = useAuth()
   const navigate = useNavigate()
 
+  // Dynamic Role Track Configuration
+  const initialRoleKey = detectRoleKey(user?.department || user?.role || user?.stream)
+  const [selectedRoleKey, setSelectedRoleKey] = useState(initialRoleKey)
+  const activeRoleConfig = ROLE_OFFER_CONFIGS[selectedRoleKey] || ROLE_OFFER_CONFIGS['bde']
+
+  const [customSalary, setCustomSalary] = useState(activeRoleConfig.defaultSalary)
   const [signatureMode, setSignatureMode] = useState('draw') // 'draw' | 'upload'
   const [signatureData, setSignatureData] = useState(null)
   const [sendingEmail, setSendingEmail] = useState(false)
@@ -33,10 +40,17 @@ function OfferLetterView() {
 
   const candidateName = user?.name || user?.email?.split('@')[0] || 'Candidate'
   const candidateEmail = user?.email || ''
-  const candidateRole = user?.department ? `${user.department} Specialist` : 'Business Development Executive'
   const todayDateStr = getFormattedDate()
   const startDateStr = getFormattedDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000))
-  const fixedSalary = '₹30,000 per month'
+
+  // Update default salary when changing role track
+  const handleRoleChange = (e) => {
+    const newKey = e.target.value
+    setSelectedRoleKey(newKey)
+    if (ROLE_OFFER_CONFIGS[newKey]) {
+      setCustomSalary(ROLE_OFFER_CONFIGS[newKey].defaultSalary)
+    }
+  }
 
   // Load saved signature from session storage if present
   useEffect(() => {
@@ -229,9 +243,14 @@ function OfferLetterView() {
         body: JSON.stringify({
           candidateName,
           candidateEmail,
-          role: candidateRole,
-          salary: fixedSalary,
+          role: activeRoleConfig.title,
+          department: activeRoleConfig.department,
+          salary: customSalary,
           startDate: startDateStr,
+          openingStatement: activeRoleConfig.openingStatement,
+          incentiveDescription: activeRoleConfig.incentiveDescription,
+          targets: activeRoleConfig.targets,
+          reportingTools: activeRoleConfig.reportingTools,
           signatureDataUrl: signatureData,
           pdfBase64
         })
@@ -294,6 +313,48 @@ function OfferLetterView() {
           {emailStatus.message}
         </div>
       )}
+
+      {/* Role & Package Customizer Box (Interactive & Role-Specific) */}
+      <div className="role-customizer-box no-print">
+        <div className="role-customizer-header">
+          <h4>💼 Position Track & Package Configuration</h4>
+          <span className="dept-badge">
+            🏢 {activeRoleConfig.department}
+          </span>
+        </div>
+
+        <div className="role-customizer-grid">
+          <div className="role-field-group">
+            <label htmlFor="role-select">Select Candidate Job Role</label>
+            <select
+              id="role-select"
+              className="role-select-input"
+              value={selectedRoleKey}
+              onChange={handleRoleChange}
+            >
+              {Object.values(ROLE_OFFER_CONFIGS).map((cfg) => (
+                <option key={cfg.id} value={cfg.id}>
+                  {cfg.title} — ({cfg.department})
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="role-field-group">
+            <label htmlFor="salary-input">Monthly Gross Remuneration</label>
+            <div className="salary-input-wrapper">
+              <input
+                id="salary-input"
+                type="text"
+                className="salary-text-input"
+                value={customSalary}
+                onChange={(e) => setCustomSalary(e.target.value)}
+                placeholder="e.g. ₹35,000 per month"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* E-Signature Control Box (hidden during print) */}
       {!signatureData && (
@@ -385,8 +446,8 @@ function OfferLetterView() {
         <div className="doc-salutation">Dear {candidateName},</div>
 
         <p className="doc-p">
-          We are pleased to offer you the position of <strong>{candidateRole}</strong> at <strong>Infogenx Private Limited</strong>.
-          Based on your background, skills, and assessment performance, we believe you will be a valuable asset to our global business strategy.
+          We are pleased to offer you the position of <strong>{activeRoleConfig.title}</strong> in our <strong>{activeRoleConfig.department}</strong> division at <strong>Infogenx Private Limited</strong>.
+          {' '}{activeRoleConfig.openingStatement}
         </p>
 
         <p className="doc-p">
@@ -395,21 +456,23 @@ function OfferLetterView() {
 
         <h4 className="doc-h4">1. Remuneration & Compensation</h4>
         <ul className="doc-ul">
-          <li><strong>Fixed Monthly Salary:</strong> You will receive a consolidated gross salary of <strong>{fixedSalary}</strong>.</li>
-          <li><strong>Performance Incentives:</strong> You are eligible for a Performance-Linked Incentive (PLI) for every project successfully converted or delivered. The incentive is calculated based on project profitability and milestone delivery.</li>
-          <li><strong>Payment Schedule:</strong> Salary and earned incentives will be transferred to your designated bank account during the first week of every month, following verification of your monthly deliverables.</li>
+          <li><strong>Fixed Monthly Salary:</strong> You will receive a consolidated gross salary of <strong>{customSalary}</strong>.</li>
+          <li><strong>Performance Incentives:</strong> {activeRoleConfig.incentiveDescription}</li>
+          <li><strong>Payment Schedule:</strong> Salary and earned performance incentives will be transferred to your designated bank account during the first week of every month, following verification of your monthly deliverables.</li>
         </ul>
 
         <h4 className="doc-h4">2. Performance Expectations & Targets</h4>
         <ul className="doc-ul">
-          <li><strong>Initial Target:</strong> Consistent output and adherence to project deliverables within your first month.</li>
-          <li><strong>Contract Continuity:</strong> This offer is performance-linked. Maintaining a consistent pipeline of completed tasks is required to ensure contract continuity.</li>
-          <li><strong>Performance Review:</strong> A formal review will be conducted after six months. Upon satisfactory performance and meeting growth KPIs, a potential 10% base salary increase will be considered.</li>
+          {activeRoleConfig.targets.map((tgt, idx) => (
+            <li key={idx}>
+              <strong>{tgt.label}:</strong> {tgt.text}
+            </li>
+          ))}
         </ul>
 
         <h4 className="doc-h4">3. Reporting & Operations</h4>
         <p className="doc-p">
-          As part of our data-driven approach, you are required to maintain a daily log of your activities and project statuses in the company’s designated tracking system (Google Sheets / Zoho CRM). This report must be kept up to date to facilitate monthly payouts.
+          As part of our data-driven approach, you are required to maintain a daily log of your activities, code commits, and project milestones in the company’s designated operational systems (<strong>{activeRoleConfig.reportingTools}</strong>). This report must be kept up to date to facilitate monthly payouts.
         </p>
 
         <h4 className="doc-h4">4. Acceptance and Commencement</h4>
@@ -437,7 +500,7 @@ function OfferLetterView() {
           <div className="doc-sig-col candidate-col">
             <h5 className="doc-sig-h5">Candidate Acceptance</h5>
             <p className="doc-sig-sub">
-              I, <strong>{candidateName}</strong>, accept the offer of employment as <strong>{candidateRole}</strong> under the terms and conditions outlined above.
+              I, <strong>{candidateName}</strong>, accept the offer of employment as <strong>{activeRoleConfig.title}</strong> under the terms and conditions outlined above.
             </p>
             <div className="doc-sig-img-container">
               {signatureData ? (

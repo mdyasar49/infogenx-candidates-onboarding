@@ -22,6 +22,119 @@
   border: 1px solid #e2e8f0;
 }
 
+/* Role Selector Customizer Card */
+.role-customizer-box {
+  max-width: 850px;
+  margin: 0 auto 20px auto;
+  background: linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+  padding: 18px 24px;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  border-left: 5px solid #E65525;
+  box-shadow: 0 4px 16px rgba(0, 18, 60, 0.06);
+}
+
+.role-customizer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.role-customizer-header h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #00123C;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dept-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #EEF4FF;
+  color: #000E68;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid rgba(0, 14, 104, 0.15);
+}
+
+.role-customizer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 16px;
+}
+
+@media (max-width: 640px) {
+  .role-customizer-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.role-field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.role-field-group label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #475569;
+}
+
+.role-select-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #00123C;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.role-select-input:focus {
+  border-color: #00123C;
+  box-shadow: 0 0 0 3px rgba(0, 18, 60, 0.1);
+}
+
+.salary-input-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.salary-text-input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #00123C;
+  background: #ffffff;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 8px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.salary-text-input:focus {
+  border-color: #E65525;
+  box-shadow: 0 0 0 3px rgba(230, 85, 37, 0.15);
+}
+
+
 .offer-actions-left {
   display: flex;
   gap: 10px;
