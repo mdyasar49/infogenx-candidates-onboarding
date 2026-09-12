@@ -90,7 +90,9 @@ export function generateCandidateEmailHtml(candidate) {
 <body>
   <div class="email-container">
     <div class="header">
-      <h1>INFOGENX</h1>
+      <a href="https://candidates.infogenx.com" target="_blank" style="text-decoration: none; display: inline-block;">
+        <img src="https://candidates.infogenx.com/logo_white.png" alt="INFOGENX" width="180" style="width: 180px; max-width: 180px; height: auto; display: block; margin: 0 auto 8px auto; border: 0;" />
+      </a>
       <div class="badge">HR Training & Candidate Review</div>
     </div>
     <div class="content">
