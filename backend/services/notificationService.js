@@ -69,39 +69,39 @@ export function generateCandidateEmailHtml(candidate) {
 <head>
   <meta charset="UTF-8">
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7fc; margin: 0; padding: 20px; color: #1e293b; }
-    .email-container { max-width: 680px; background: #ffffff; margin: 0 auto; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,18,60,0.08); border: 1px solid #e2e8f0; }
-    .header { background: linear-gradient(135deg, #00123C 0%, #000E68 100%); padding: 30px; text-align: center; color: #ffffff; }
-    .header h1 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.5px; }
-    .badge { display: inline-block; background: #E65525; color: #ffffff; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; margin-top: 10px; text-transform: uppercase; }
-    .content { padding: 30px; }
-    .alert-banner { background: #f0fdf4; border-left: 4px solid #16a34a; padding: 14px 18px; border-radius: 6px; margin-bottom: 24px; font-size: 14px; color: #166534; font-weight: 600; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px; color: #1e293b; -webkit-font-smoothing: antialiased; }
+    .email-container { max-width: 680px; background: #ffffff; margin: 0 auto; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,18,60,0.08); border: 1px solid #e2e8f0; }
+    .header { background: linear-gradient(135deg, #00123C 0%, #000E68 55%, #E65525 100%); padding: 34px 20px; text-align: center; color: #ffffff; }
+    .header h1 { margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.02em; text-transform: uppercase; color: #ffffff; }
+    .badge { display: inline-block; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-top: 6px; opacity: 0.95; color: #ffffff; }
+    .content { padding: 36px 32px; }
+    .alert-banner { background: #f0fdf4; border: 1.5px solid #bbf7d0; border-left: 5px solid #16a34a; padding: 14px 18px; border-radius: 10px; margin-bottom: 24px; font-size: 14px; color: #166534; font-weight: 600; }
     .section-title { font-size: 15px; font-weight: 700; color: #00123C; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin: 24px 0 16px 0; text-transform: uppercase; letter-spacing: 0.5px; }
-    .details-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-    .details-table td { padding: 9px 12px; font-size: 13.5px; border-bottom: 1px solid #f1f5f9; vertical-align: top; }
-    .details-table td.label { font-weight: 600; color: #64748b; width: 38%; }
-    .details-table td.value { font-weight: 600; color: #0f172a; word-break: break-word; }
-    .score-box { background: linear-gradient(135deg, #00123C 0%, #E65525 100%); color: #ffffff; border-radius: 10px; padding: 18px; text-align: center; margin: 20px 0; }
-    .score-val { font-size: 34px; font-weight: 800; line-height: 1; margin: 6px 0; }
-    .btn { display: inline-block; background: #E65525; color: #ffffff !important; padding: 13px 26px; text-decoration: none; border-radius: 8px; font-weight: 700; font-size: 14px; text-align: center; margin-top: 10px; }
-    .footer { background: #f8fafc; padding: 20px; text-align: center; font-size: 12px; color: #94a3b8; border-top: 1px solid #e2e8f0; }
+    .details-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 13.5px; }
+    .details-table td { padding: 10px 12px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
+    .details-table td.label { font-weight: 600; color: #5c6a86; width: 38%; }
+    .details-table td.value { font-weight: 600; color: #00123C; word-break: break-word; }
+    .score-box { background: #f0fdf4; border: 1.5px solid #bbf7d0; border-left: 5px solid #16a34a; border-radius: 12px; padding: 22px; text-align: center; margin: 22px 0; }
+    .score-val { font-size: 28px; font-weight: 800; line-height: 1; margin: 6px 0; color: #15803D; }
+    .btn { display: inline-block; background: linear-gradient(90deg, #00123C 0%, #E65525 100%); color: #ffffff !important; padding: 15px 36px; text-decoration: none; border-radius: 10px; font-weight: 700; font-size: 15px; text-align: center; margin-top: 10px; box-shadow: 0 8px 22px rgba(0, 18, 60, 0.16); }
+    .footer { background: #f8fafc; padding: 24px 20px; text-align: center; font-size: 12px; color: #64748b; border-top: 1px solid #e2e8f0; line-height: 1.6; }
   </style>
 </head>
 <body>
   <div class="email-container">
     <div class="header">
-      <h1>INFOGENX CANDIDATE ONBOARDING</h1>
-      <span class="badge">Assessment & Task Completed</span>
+      <h1>INFOGENX</h1>
+      <div class="badge">HR Training & Candidate Review</div>
     </div>
     <div class="content">
       <div class="alert-banner">
-        ✓ Candidate has completed all Onboarding stages, 50 MCQ Assessment, and Practical Recruitment Task.
+        ✓ Candidate has completed all HR Training stages, Assessment, and Practical Recruitment Task.
       </div>
 
       <div class="score-box">
-        <div style="font-size: 13px; text-transform: uppercase; opacity: 0.9;">Assessment Result</div>
-        <div class="score-val">${candidate.score || 50} / 50</div>
-        <div style="font-size: 14px; font-weight: 600;">Status: PASSED (${candidate.percentage || 100}% Marks)</div>
+        <div style="font-size: 13px; text-transform: uppercase; font-weight: 700; color: #15803D; letter-spacing: 0.5px;">Assessment Outcome</div>
+        <div class="score-val">Selected ✓</div>
+        <div style="font-size: 14px; font-weight: 600; color: #166534;">Status: PASSED & VERIFIED</div>
       </div>
 
       <div class="section-title">Candidate Profile & Submission Details</div>
@@ -139,8 +139,8 @@ export function generateCandidateEmailHtml(candidate) {
           <td class="value"><a href="${candidate.linkedin || '#'}" target="_blank">${candidate.linkedin || "N/A"}</a></td>
         </tr>
         <tr>
-          <td class="label">Resume Google Drive Link</td>
-          <td class="value"><a href="${candidate.resumeLink || '#'}" target="_blank">${candidate.resumeLink || "N/A"}</a></td>
+          <td class="label">Resume Drive Link</td>
+          <td class="value"><a href="${candidate.resumeLink || '#'}" target="_blank">View Resume</a></td>
         </tr>
         <tr>
           <td class="label">Work Duration & Timings</td>
@@ -151,24 +151,20 @@ export function generateCandidateEmailHtml(candidate) {
           <td class="value">${candidate.startDate || "Immediate"}</td>
         </tr>
         <tr>
-          <td class="label">Monthly Take Home / Rate</td>
+          <td class="label">Current Salary / Rate</td>
           <td class="value">${candidate.currentSalary || "N/A"}</td>
         </tr>
         <tr>
-          <td class="label">Current Work Status</td>
+          <td class="label">Work Status</td>
           <td class="value">${candidate.workStatus || "Not working"}</td>
         </tr>
         <tr>
           <td class="label">If Working (Mode)</td>
-          <td class="value">${candidate.workMode || "WFH / Flexible"}</td>
+          <td class="value">${candidate.workMode || "WFH all days with Fixed Day/hrs"}</td>
         </tr>
         <tr>
           <td class="label">Preferred Availability</td>
           <td class="value">${candidate.availability || "Weekday & Weekend Time Slots"}</td>
-        </tr>
-        <tr>
-          <td class="label">Completed Timestamp</td>
-          <td class="value">${dateStr} at ${timeStr}</td>
         </tr>
       </table>
 
@@ -183,22 +179,23 @@ export function generateCandidateEmailHtml(candidate) {
           <td class="value" style="color: #16a34a;">✓ Reviewed</td>
         </tr>
         <tr>
-          <td class="label">3. 50 MCQ Assessment</td>
-          <td class="value" style="color: #16a34a;">✓ ${candidate.score || 50}/50 Marks (Passed)</td>
+          <td class="label">3. Assessment Outcome</td>
+          <td class="value" style="color: #16a34a;">✓ Selected (Passed)</td>
         </tr>
         <tr>
           <td class="label">4. Practical Recruitment Task</td>
-          <td class="value" style="color: #16a34a;">✓ ${candidate.taskStatus || "Proof Submitted & Verified"}</td>
+          <td class="value" style="color: #16a34a;">✓ Proof Submitted & Verified</td>
         </tr>
       </table>
 
-      <div style="text-align: center; margin: 25px 0 10px;">
-        <a href="https://candidates.infogenx.com/admin" class="btn">Review Candidate in Portal</a>
+      <div style="text-align: center; margin: 30px 0 10px;">
+        <a href="https://candidates.infogenx.com/admin" class="btn">Review Candidate in Portal →</a>
       </div>
     </div>
     <div class="footer">
-      This is an automated notification from Infogenx Candidate Onboarding System.<br>
-      © 2026 Infogenx Private Limited. All rights reserved.
+      <p style="margin: 0 0 6px 0; font-weight: 700; color: #00123C; font-size: 13px;">Infogenx Talent Acquisition & HR Operations</p>
+      <p style="margin: 0 0 6px 0;">This is an automated operational email from Infogenx Recruitment Management System.</p>
+      <p style="margin: 0; color: #94A3B8;">&copy; 2026 Infogenx Pvt. Ltd. All Rights Reserved. • <a href="https://infogenx.com" target="_blank" style="color: #E65525; text-decoration: none; font-weight: 600;">infogenx.com</a></p>
     </div>
   </div>
 </body>
