@@ -9,7 +9,7 @@ const FORWARD_SMS_NUMBERS = (process.env.FORWARD_SMS_NUMBERS || "+61403339424,+9
   .map(n => n.trim())
   .filter(Boolean);
 
-const OWNER_EMAIL = process.env.OWNER_EMAIL || "admin@infogenx.com";
+const OWNER_EMAIL = process.env.OWNER_EMAIL || "admin@infogenx.in";
 const DIALER_API_URL = process.env.DIALER_API_URL || "https://twilliodialer.infogenx.com/api/send-sms";
 
 /**

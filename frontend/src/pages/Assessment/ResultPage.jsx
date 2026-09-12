@@ -215,7 +215,7 @@ function ResultPage() {
                   marginBottom: '12px',
                   letterSpacing: '0.05em'
                 }}>
-                  {passed ? 'PASS ✓' : 'FAIL ✕'}
+                  {passed ? 'SELECTED ✓' : 'NOT SELECTED ✕'}
                 </div>
 
                 <h2 style={{
@@ -224,11 +224,13 @@ function ResultPage() {
                   color: passed ? '#15803D' : '#E65525',
                   margin: '0 0 6px'
                 }}>
-                  Score: {score} / 50
+                  {passed ? 'Selected' : 'Not Selected'}
                 </h2>
 
-                <p style={{ fontSize: '17px', fontWeight: '700', color: '#00123C', margin: 0 }}>
-                  Percentage: {percentage}%
+                <p style={{ fontSize: '16px', fontWeight: '600', color: '#475569', margin: 0 }}>
+                  {passed
+                    ? 'Congratulations! You have been selected to proceed with the HR Training Process.'
+                    : 'Thank you for your participation. You have not been selected on this evaluation.'}
                 </p>
               </div>
 
@@ -240,8 +242,10 @@ function ResultPage() {
                 gap: '14px'
               }}>
                 <div style={{ background: '#FFF8F3', border: '1px solid rgba(0, 18, 60, 0.08)', borderRadius: '14px', padding: '16px', textAlign: 'center' }}>
-                  <span style={{ fontSize: '12px', color: '#5C6A86', fontWeight: '700', textTransform: 'uppercase' }}>Passing Threshold</span>
-                  <p style={{ fontSize: '18px', fontWeight: '800', color: '#00123C', margin: '4px 0 0' }}>80% (40/50)</p>
+                  <span style={{ fontSize: '12px', color: '#5C6A86', fontWeight: '700', textTransform: 'uppercase' }}>Evaluation Status</span>
+                  <p style={{ fontSize: '18px', fontWeight: '800', color: passed ? '#15803D' : '#E65525', margin: '4px 0 0' }}>
+                    {passed ? 'Selected' : 'Not Selected'}
+                  </p>
                 </div>
 
                 <div style={{ background: '#FFF8F3', border: '1px solid rgba(0, 18, 60, 0.08)', borderRadius: '14px', padding: '16px', textAlign: 'center' }}>
@@ -252,9 +256,9 @@ function ResultPage() {
                 </div>
 
                 <div style={{ background: '#FFF8F3', border: '1px solid rgba(0, 18, 60, 0.08)', borderRadius: '14px', padding: '16px', textAlign: 'center' }}>
-                  <span style={{ fontSize: '12px', color: '#5C6A86', fontWeight: '700', textTransform: 'uppercase' }}>Evaluation Status</span>
-                  <p style={{ fontSize: '18px', fontWeight: '800', color: passed ? '#22C55E' : '#E65525', margin: '4px 0 0' }}>
-                    {passed ? 'PASSED' : 'NOT PASSED'}
+                  <span style={{ fontSize: '12px', color: '#5C6A86', fontWeight: '700', textTransform: 'uppercase' }}>Next Stage</span>
+                  <p style={{ fontSize: '18px', fontWeight: '800', color: passed ? '#22C55E' : '#64748B', margin: '4px 0 0' }}>
+                    {passed ? 'HR Training Tasks' : 'Completed'}
                   </p>
                 </div>
               </div>
@@ -324,7 +328,7 @@ function ResultPage() {
                         Your Profile & Assessment Have Been Submitted
                       </h3>
                       <p style={{ fontSize: '14px', color: '#64748B', maxWidth: '580px', margin: '0 auto 20px', lineHeight: '1.6' }}>
-                        Your evaluation score ({score}/50) and profile questionnaire details have been sent to Infogenx HR Management and Executive Leadership. Twilio SMS and email alerts have been dispatched.
+                        Your selection status and profile questionnaire details have been sent to Infogenx HR Management and Executive Leadership.
                       </p>
                       <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
                         <button

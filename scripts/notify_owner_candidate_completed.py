@@ -9,7 +9,7 @@ if sys.platform == "win32":
 
 # Target Forward Numbers from Twilio Dialer configuration
 FORWARD_SMS_NUMBERS = ["+61403339424", "+919787806366"]
-OWNER_EMAIL = "admin@infogenx.com"
+OWNER_EMAIL = "admin@infogenx.in"
 
 def get_candidate_sms_text(candidate):
     """
@@ -60,9 +60,9 @@ def get_candidate_email_text(candidate):
 
     email_body = f"""Subject: [CANDIDATE ONBOARDING COMPLETED] {name} - Assessment Score: {score}/{total} ({pct}%)
 
-Dear Sir / Management,
+Dear HR Team,
 
-A candidate has successfully completed all stages of the Infogenx Candidate Onboarding Assessment and Practical Task. Below are the complete profile details for your review:
+This candidate has successfully completed all stages of the HR Training Process & and Practical Task. Below are the Candidate details for your review:
 
 =======================================================
                CANDIDATE PROFILE DETAILS
