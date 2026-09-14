@@ -60,7 +60,7 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
       '<table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #FFFFFF; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 30px rgba(0, 18, 60, 0.08); border: 1px solid #E2E8F0;">' +
       '<!-- Header Branding -->' +
       '<tr>' +
-      '<td align="center" style="background: linear-gradient(135deg, #00123C 0%, #000E68 55%, #E65525 100%); padding: 34px 20px; color: #FFFFFF;">' +
+      '<td align="center" style="background: linear-gradient(135deg, #00123C 0%, #000E68 55%, #2563EB 100%); padding: 34px 20px; color: #FFFFFF;">' +
       '<a href="https://candidates.infogenx.com" target="_blank" style="text-decoration: none; display: inline-block;">' +
       '<img src="https://candidates.infogenx.com/logo_white.png" alt="INFOGENX" width="180" style="width: 180px; max-width: 180px; height: auto; display: block; margin: 0 auto 8px auto; border: 0;" />' +
       '</a>' +
@@ -70,15 +70,20 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
       '<!-- Content Body -->' +
       '<tr>' +
       '<td style="padding: 36px 32px; color: #00123C;">' +
-      '<p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">Dear Candidate,</p>' +
-      '<p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thanks for filling out this form. Please log in to the <a href="' + PORTAL_URL + '" target="_blank" style="color: #E65525; font-weight: 700; text-decoration: underline;">HR Training Application</a> using your registered email ID and the following password to complete the entire training process.</p>' +
-      '<p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #00123C; font-weight: 700;">Password: <span style="color: #E65525; font-family: monospace; font-size: 18px; font-weight: 800; letter-spacing: 0.05em;">' + password + '</span></p>' +
+      '<p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #334155;">Dear Candidate,</p>' +
+      '<p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thank you for completing the registration form.</p>' +
+      '<p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">To proceed with your onboarding, please click the below button or following link <a href="' + PORTAL_URL + '" target="_blank" style="color: #2563EB; font-weight: 700; text-decoration: underline;">Click Here</a> to login in to the HR Training Application using your registered email address and the temporary password provided below:</p>' +
+      '<p style="margin: 0 0 12px 0; font-size: 15px; line-height: 1.6; color: #00123C; font-weight: 700;">Application Link: <a href="' + PORTAL_URL + '" target="_blank" style="color: #2563EB; font-weight: 700; text-decoration: underline;">Click Here</a></p>' +
+      '<p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #00123C; font-weight: 700;">Password: <span style="color: #2563EB; font-family: monospace; font-size: 18px; font-weight: 800; letter-spacing: 0.05em;">' + password + '</span></p>' +
       '<!-- CTA Button -->' +
-      '<div align="center" style="margin: 30px 0 24px 0;">' +
-      '<a href="' + PORTAL_URL + '" target="_blank" style="background: linear-gradient(90deg, #00123C 0%, #E65525 100%); color: #FFFFFF !important; text-decoration: none; padding: 15px 36px; border-radius: 10px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 8px 22px rgba(0, 18, 60, 0.16); text-align: center;">Access Candidate Portal →</a>' +
+      '<div align="center" style="margin: 28px 0 24px 0;">' +
+      '<a href="' + PORTAL_URL + '" target="_blank" style="background: linear-gradient(90deg, #00123C 0%, #2563EB 100%); color: #FFFFFF !important; text-decoration: none; padding: 15px 36px; border-radius: 10px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 8px 22px rgba(37, 99, 235, 0.2); text-align: center;">Click Here to Access HR Training Application →</a>' +
       '</div>' +
       '<!-- Direct Link Fallback -->' +
-      '<p style="margin: 0; font-size: 13px; color: #94A3B8; text-align: center; line-height: 1.5;">If the button above does not work, copy and paste this link into your browser:<br><a href="' + PORTAL_URL + '" target="_blank" style="color: #E65525; text-decoration: underline;">' + PORTAL_URL + '</a></p>' +
+      '<p style="margin: 0 0 12px 0; font-size: 14px; line-height: 1.6; color: #475569;">Please complete the training process at your earliest convenience. If you encounter any issues accessing the portal through the button above, copy and paste the following link directly into your browser:</p>' +
+      '<p style="margin: 0 0 28px 0; font-size: 14px; text-align: center;"><a href="' + PORTAL_URL + '" target="_blank" style="color: #2563EB; font-weight: 600; text-decoration: underline;">' + PORTAL_URL + '</a></p>' +
+      '<p style="margin: 0 0 4px 0; font-size: 15px; line-height: 1.6; color: #334155;">Best regards,</p>' +
+      '<p style="margin: 0; font-size: 15px; font-weight: 700; color: #00123C;">Infogenx Talent Acquisition & HR Operations</p>' +
       '</td>' +
       '</tr>' +
       '<!-- Unified Footer -->' +
@@ -86,7 +91,7 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
       '<td align="center" style="background-color: #F8FAFC; border-top: 1px solid #E2E8F0; padding: 24px 20px; color: #64748B; font-size: 12px; line-height: 1.6;">' +
       '<p style="margin: 0 0 6px 0; font-weight: 700; color: #00123C; font-size: 13px;">Infogenx Talent Acquisition & HR Operations</p>' +
       '<p style="margin: 0 0 6px 0;">This is an automated operational email from Infogenx Recruitment Management System.</p>' +
-      '<p style="margin: 0; color: #94A3B8;">&copy; 2026 Infogenx Pvt. Ltd. All Rights Reserved. • <a href="https://infogenx.com" target="_blank" style="color: #E65525; text-decoration: none; font-weight: 600;">infogenx.com</a></p>' +
+      '<p style="margin: 0; color: #94A3B8;">&copy; 2026 Infogenx Pvt. Ltd. All Rights Reserved. • <a href="https://infogenx.com" target="_blank" style="color: #2563EB; text-decoration: none; font-weight: 600;">infogenx.com</a></p>' +
       '</td>' +
       '</tr>' +
       '</table>' +
@@ -97,10 +102,14 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
       '</html>';
 
     const plainTextBody = "Dear Candidate,\n\n" +
-      "Thanks for filling out this form. Please log in to the HR Training Application through the following link using your registered email ID and the following password to complete the entire training process.\n\n" +
-      "Generated Password: " + password + "\n\n" +
-      "Portal Link: " + PORTAL_URL + "\n\n" +
-      "Best regards,\nInfogenx Recruitment Team";
+      "Thank you for completing the registration form.\n\n" +
+      "To proceed with your onboarding, please click the following link https://candidates.infogenx.com/login to login in to the HR Training Application using your registered email address and the temporary password provided below:\n\n" +
+      "Application Link: " + PORTAL_URL + "\n" +
+      "Password: " + password + "\n\n" +
+      "Please complete the training process at your earliest convenience. If you encounter any issues accessing the portal through the button above, copy and paste the following link directly into your browser:\n\n" +
+      PORTAL_URL + "\n\n" +
+      "Best regards,\n" +
+      "Infogenx Talent Acquisition & HR Operations";
 
     GmailApp.sendEmail(cleanEmail, subject, plainTextBody, {
       htmlBody: htmlBody,
