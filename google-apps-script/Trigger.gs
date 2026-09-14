@@ -20,6 +20,26 @@ const BACKUP_FORM_ID = "1hBH8dGgH-yNFFfnS0tHOmsZM-Tm3HhiSY-BXCNWlMV0";
 /**
  * Main Onboarding Event Handler
  */
+function onFormSubmit(e) {
+  Logger.log("=== onFormSubmit triggered ===");
+  return onStudentRegistration(e);
+}
+
+function onSubmit(e) {
+  Logger.log("=== onSubmit triggered ===");
+  return onStudentRegistration(e);
+}
+
+function handleFormSubmit(e) {
+  Logger.log("=== handleFormSubmit triggered ===");
+  return onStudentRegistration(e);
+}
+
+function onEdit(e) {
+  Logger.log("=== onEdit triggered ===");
+  return onStudentRegistration(e);
+}
+
 function onStudentRegistration(e) {
   try {
     Logger.log("=== onStudentRegistration triggered ===");
@@ -149,7 +169,7 @@ function onStudentRegistration(e) {
     student.mobile = cleanText(student.mobile);
 
     if (!student.fullName) {
-      throw new Error("Full Name is missing from submission.");
+      student.fullName = "Candidate";
     }
     if (!student.email || !student.email.includes("@")) {
       throw new Error("Valid Email Address is missing from submission.");
@@ -220,9 +240,9 @@ function mapFieldToStudent(student, title, answer) {
   const t = title.toLowerCase();
   const a = typeof answer === "string" ? answer.trim() : String(answer);
 
-  if (t.includes("full name") || t === "name") student.fullName = a;
+  if (t.includes("full name") || t.includes("name")) student.fullName = a;
   else if (t.includes("birth") || t.includes("dob")) student.dob = a;
-  else if (t.includes("email")) student.email = a;
+  else if (t.includes("email") || (a.includes("@") && a.includes("."))) student.email = a.toLowerCase();
   else if (t.includes("mobile") || t.includes("phone") || t.includes("contact")) student.mobile = a;
   else if (t.includes("city") || t.includes("location")) student.city = a;
   else if (t.includes("qualification")) student.qualification = a;
