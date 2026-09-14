@@ -4,6 +4,20 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
     return;
   }
 
+  const cleanEmail = email.trim().toLowerCase();
+
+  // -------------------------------------------------------------------
+  // DEDUPLICATION LOCK: Prevent multiple emails to same recipient
+  // CacheService lock lasts 10 minutes (600 seconds)
+  // -------------------------------------------------------------------
+  const cache = CacheService.getScriptCache();
+  const cacheKey = "email_sent_" + cleanEmail;
+  if (cache.get(cacheKey)) {
+    Logger.log("sendWelcomeEmail skipped: Duplicate trigger prevented. Email already sent to " + cleanEmail + " within last 10 minutes.");
+    return;
+  }
+  cache.put(cacheKey, "true", 600);
+
   const PORTAL_URL = "https://candidates.infogenx.com/login";
   const BACKUP_PORTAL_URL = "https://infogenx-candidates-onboarding.netlify.app/login";
   const subject = "Application Received Successfully - Infogenx Candidate Portal";
@@ -13,7 +27,7 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
   try {
     const payload = JSON.stringify({
       fullName: fullName || "Candidate",
-      email: email,
+      email: cleanEmail,
       password: password || "INFO" + Math.floor(1000 + Math.random() * 9000),
       mobile: mobile || "",
       skillCategory: skillCategory || "General"
@@ -43,7 +57,7 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
         '<html>' +
         '<head>' +
         '<meta charset="utf-8">' +
-        '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
+        '<meta name="viewport" content="width=device-width, initial-color=1.0">' +
         '<title>Application Received - Infogenx</title>' +
         '</head>' +
         '<body style="margin: 0; padding: 0; background-color: #F8FAFC; font-family: \'Segoe UI\', Arial, sans-serif; -webkit-font-smoothing: antialiased;">' +
@@ -72,7 +86,7 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
         '<table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px;">' +
         '<tr>' +
         '<td style="padding: 6px 0; color: #5C6A86; font-weight: 600; width: 140px;">Registered Email:</td>' +
-        '<td style="padding: 6px 0; color: #00123C; font-weight: 700;">' + email + '</td>' +
+        '<td style="padding: 6px 0; color: #00123C; font-weight: 700;">' + cleanEmail + '</td>' +
         '</tr>' +
         '<tr>' +
         '<td style="padding: 6px 0; color: #5C6A86; font-weight: 600;">Generated Password:</td>' +
@@ -107,18 +121,18 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
 
       const plainTextBody = "Dear " + fullName + ",\n\n" +
         "Thanks for filling out this form, Please login to the HR Training Applicaiton with below user name and password and complete all training Process\n\n" +
-        "Registered Email: " + email + "\n" +
+        "Registered Email: " + cleanEmail + "\n" +
         "Generated Password: " + password + "\n\n" +
         "Portal Link: " + PORTAL_URL + "\n\n" +
         "Best regards,\nInfogenx Recruitment Team";
 
-      GmailApp.sendEmail(email, subject, plainTextBody, {
+      GmailApp.sendEmail(cleanEmail, subject, plainTextBody, {
         htmlBody: htmlBody,
         name: "Infogenx Candidate Portal"
       });
+      Logger.log("✅ GmailApp sendEmail completed for: " + cleanEmail);
     } catch (gmailErr) {
       Logger.log("GmailApp sendEmail warning: " + gmailErr.message);
     }
   }
-}
 }
