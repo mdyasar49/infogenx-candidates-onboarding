@@ -508,7 +508,7 @@ router.post('/onboard-candidate', async (req, res) => {
                   <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #00123C; font-weight: 700;">Password: <span style="color: #2563EB; font-family: monospace; font-size: 18px; font-weight: 800; letter-spacing: 0.05em;">${candidatePassword}</span></p>
 
                   <div align="center" style="margin: 28px 0 24px 0;">
-                    <a href="${PORTAL_URL}" target="_blank" style="background: linear-gradient(90deg, #00123C 0%, #2563EB 100%); color: #FFFFFF !important; text-decoration: none; padding: 15px 42px; border-radius: 10px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 8px 22px rgba(37, 99, 235, 0.2); text-align: center;">Click Here →</a>
+                    <a href="${PORTAL_URL}" target="_blank" style="background: linear-gradient(90deg, #00123C 0%, #2563EB 100%); color: #FFFFFF !important; text-decoration: none; padding: 15px 42px; border-radius: 10px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 8px 22px rgba(37, 99, 235, 0.2); text-align: center;">HR Training →</a>
                   </div>
                   <p style="margin: 0 0 12px 0; font-size: 14px; line-height: 1.6; color: #475569;">Please complete the training process at your earliest convenience. If you encounter any issues accessing the portal through the button above, copy and paste the following link directly into your browser:</p>
                   <p style="margin: 0 0 28px 0; font-size: 14px; text-align: center;"><a href="${PORTAL_URL}" target="_blank" style="color: #2563EB; font-weight: 600; text-decoration: underline;">${PORTAL_URL}</a></p>
