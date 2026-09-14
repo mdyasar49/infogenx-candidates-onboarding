@@ -71,17 +71,8 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
       '<tr>' +
       '<td style="padding: 36px 32px; color: #00123C;">' +
       '<p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">Dear Candidate,</p>' +
-      '<p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thanks for filling out this form. Please log in to the HR Training Application through the following link using your registered email ID and the following password to complete the entire training process.</p>' +
-      '<!-- Credentials Box -->' +
-      '<div style="background-color: #FFF8F3; border: 1.5px solid rgba(230, 85, 37, 0.25); border-radius: 12px; padding: 22px; margin-bottom: 26px;">' +
-      '<h3 style="margin: 0 0 14px 0; font-size: 16px; font-weight: 800; color: #E65525;">Your Login Credentials</h3>' +
-      '<table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px;">' +
-      '<tr>' +
-      '<td style="padding: 6px 0; color: #5C6A86; font-weight: 600; width: 140px;">Generated Password:</td>' +
-      '<td style="padding: 6px 0; color: #E65525; font-weight: 800; font-family: monospace; font-size: 16px; letter-spacing: 0.05em;">' + password + '</td>' +
-      '</tr>' +
-      '</table>' +
-      '</div>' +
+      '<p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thanks for filling out this form. Please log in to the <a href="' + PORTAL_URL + '" target="_blank" style="color: #E65525; font-weight: 700; text-decoration: underline;">HR Training Application</a> using your registered email ID and the following password to complete the entire training process.</p>' +
+      '<p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #00123C; font-weight: 700;">Password: <span style="color: #E65525; font-family: monospace; font-size: 18px; font-weight: 800; letter-spacing: 0.05em;">' + password + '</span></p>' +
       '<!-- CTA Button -->' +
       '<div align="center" style="margin: 30px 0 24px 0;">' +
       '<a href="' + PORTAL_URL + '" target="_blank" style="background: linear-gradient(90deg, #00123C 0%, #E65525 100%); color: #FFFFFF !important; text-decoration: none; padding: 15px 36px; border-radius: 10px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 8px 22px rgba(0, 18, 60, 0.16); text-align: center;">Access Candidate Portal →</a>' +
