@@ -117,9 +117,28 @@ function onStudentRegistration(e) {
     // -------------------------------------------------------
     // Case 4: Direct Payload (e.student or parameter)
     // -------------------------------------------------------
-    else if (e.student) {
-      Logger.log("[Source: Direct Student Object]");
-      Object.assign(student, e.student);
+    // -------------------------------------------------------
+    // Bulletproof Email Resolution Fallback
+    // -------------------------------------------------------
+    if (!student.email || !student.email.includes("@")) {
+      try {
+        const ss = SpreadsheetApp.openById(TARGET_DATABASE_ID);
+        const sheet = ss.getSheets()[0];
+        const lastRow = sheet.getLastRow();
+        if (lastRow >= 1) {
+          const rowValues = sheet.getRange(lastRow, 1, 1, Math.min(sheet.getLastColumn(), 10)).getValues()[0];
+          for (let col = 0; col < rowValues.length; col++) {
+            const cellVal = String(rowValues[col] || "").trim();
+            if (cellVal.includes("@") && cellVal.includes(".")) {
+              student.email = cellVal.toLowerCase();
+              Logger.log("Fallback email extracted from spreadsheet last row: " + student.email);
+              break;
+            }
+          }
+        }
+      } catch (sfErr) {
+        Logger.log("Notice on spreadsheet email fallback: " + sfErr.message);
+      }
     }
 
     // -------------------------------------------------------
