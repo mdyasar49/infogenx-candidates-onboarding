@@ -207,38 +207,63 @@ function onStudentRegistration(e) {
 function mapFieldToStudent(student, title, answer) {
   if (!title || answer === null || answer === undefined) return;
   const t = title.toLowerCase();
-  const a = typeof answer === "string" ? answer.trim() : String(answer);
+  const a = typeof answer === "string" ? answer.trim() : (Array.isArray(answer) ? answer.join(", ").trim() : String(answer).trim());
 
-  if (t.includes("name")) student.fullName = a;
-  else if (t.includes("birth") || t.includes("dob")) student.dob = a;
-  else if (t.includes("email")) student.email = a;
-  else if (t.includes("mobile") || t.includes("phone") || t.includes("contact")) student.mobile = a;
-  else if (t.includes("city") || t.includes("location")) student.city = a;
-  else if (t.includes("qualification")) student.qualification = a;
-  else if (t.includes("college") || t.includes("collage") || t.includes("university") || t.includes("institution")) student.college = a;
-  else if (t.includes("department") || t.includes("branch") || t.includes("stream")) student.department = a;
-  else if (t.includes("passing") || t.includes("year")) student.yearOfPassing = a;
-  else if (t.includes("category")) student.skillCategory = a;
-  else if (t.includes("skills") || t === "skill") student.skills = a;
-  else if (t.includes("experience type") || t === "experience" || t.includes("experience")) student.experienceType = a;
-  else if (t.includes("company name")) student.companyName = a;
-  else if (t.includes("experience (years)") || t.includes("any experience")) student.experienceYears = a;
-  else if (t.includes("expected salary")) student.expectedSalary = a;
-  else if (t.includes("current monthly") || t.includes("take home") || t.includes("hourly rate") || t.includes("current salary")) {
+  if (a.includes("@") && a.includes(".")) {
+    student.email = a.toLowerCase();
+  }
+
+  if (t.includes("email") || t.includes("mail")) {
+    student.email = a.toLowerCase();
+  } else if (t.includes("name")) {
+    student.fullName = a;
+  } else if (t.includes("birth") || t.includes("dob")) {
+    student.dob = a;
+  } else if (t.includes("mobile") || t.includes("phone") || t.includes("contact")) {
+    student.mobile = a;
+  } else if (t.includes("city") || t.includes("location")) {
+    student.city = a;
+  } else if (t.includes("qualification")) {
+    student.qualification = a;
+  } else if (t.includes("college") || t.includes("collage") || t.includes("university") || t.includes("institution")) {
+    student.college = a;
+  } else if (t.includes("department") || t.includes("branch") || t.includes("stream")) {
+    student.department = a;
+  } else if (t.includes("passing") || t.includes("year")) {
+    student.yearOfPassing = a;
+  } else if (t.includes("category")) {
+    student.skillCategory = a;
+  } else if (t.includes("skills") || t === "skill") {
+    student.skills = a;
+  } else if (t.includes("experience type") || t === "experience" || t.includes("experience")) {
+    student.experienceType = a;
+  } else if (t.includes("company name")) {
+    student.companyName = a;
+  } else if (t.includes("experience (years)") || t.includes("any experience")) {
+    student.experienceYears = a;
+  } else if (t.includes("expected salary")) {
+    student.expectedSalary = a;
+  } else if (t.includes("current monthly") || t.includes("take home") || t.includes("hourly rate") || t.includes("current salary")) {
     student.currentSalary = a;
     student.currentTakeHomeSalaryHourlyRate = a;
-  }
-  else if (t.includes("resume")) student.resumeLink = a;
-  else if (t.includes("preferred time") || t.includes("duration & timings") || t.includes("timings you can work") || t.includes("working hours") || t.includes("preferred working")) {
+  } else if (t.includes("resume")) {
+    student.resumeLink = a;
+  } else if (t.includes("preferred time") || t.includes("duration & timings") || t.includes("timings you can work") || t.includes("working hours") || t.includes("preferred working")) {
     student.preferredTime = a;
     student.workDurationTimings = a;
+  } else if (t.includes("certification")) {
+    student.certification = a;
+  } else if (t.includes("linkedin")) {
+    student.linkedinUrl = a;
+  } else if (t.includes("start date")) {
+    student.startDate = a;
+  } else if (t.includes("work status")) {
+    student.currentWorkStatus = a;
+  } else if (t.includes("if working then") || t.includes("working type")) {
+    student.workingType = a;
+  } else if (t.includes("availability")) {
+    student.preferredAvailability = a;
   }
-  else if (t.includes("certification")) student.certification = a;
-  else if (t.includes("linkedin")) student.linkedinUrl = a;
-  else if (t.includes("start date")) student.startDate = a;
-  else if (t.includes("work status")) student.currentWorkStatus = a;
-  else if (t.includes("if working then") || t.includes("working type")) student.workingType = a;
-  else if (t.includes("availability")) student.preferredAvailability = a;
 }
 
 /**
@@ -518,4 +543,37 @@ function testEndToEndRegistration() {
   };
 
   return onStudentRegistration({ student: testStudent });
+}
+
+/**
+ * Diagnostic Function for Pinpointing Execution Errors
+ */
+function debugTest() {
+  const logs = [];
+  try {
+    logs.push("Step 1: Get Database ID");
+    const dbId = getDatabaseId();
+    logs.push("Database ID: " + dbId);
+
+    logs.push("Step 2: Open Spreadsheet");
+    const ss = SpreadsheetApp.openById(dbId);
+    logs.push("Spreadsheet opened: " + ss.getName());
+
+    logs.push("Step 3: Get Students Sheet");
+    const sheet = getStudentsSheet();
+    logs.push("Students Sheet rows: " + sheet.getLastRow());
+
+    logs.push("Step 4: Generate Password");
+    const pwd = generatePassword("Test Candidate", "2000-01-01");
+    logs.push("Generated Pwd: " + pwd);
+
+    logs.push("Step 5: Send Email Test");
+    sendWelcomeEmail("mdyasardeveloper786@gmail.com", "Test Candidate", pwd, "9876543210", "IT");
+    logs.push("Email sent successfully!");
+
+    return { success: true, logs: logs };
+  } catch (e) {
+    logs.push("ERROR caught: " + e.message + " | Stack: " + e.stack);
+    return { success: false, logs: logs, error: e.message };
+  }
 }

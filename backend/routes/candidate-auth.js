@@ -442,14 +442,8 @@ router.post('/onboard-candidate', async (req, res) => {
     const cleanEmail = email.trim().toLowerCase();
     const now = Date.now();
 
-    // 1. Check in-memory 15-minute deduplication lock
-    if (recentOnboardedEmails.has(cleanEmail)) {
-      const lastSentTime = recentOnboardedEmails.get(cleanEmail);
-      if (now - lastSentTime < 15 * 60 * 1000) {
-        console.log(`[Onboard] Skipped duplicate welcome email for ${cleanEmail} (memory lock).`);
-        return res.status(200).json({ success: true, message: 'Candidate onboarded (duplicate email suppressed).' });
-      }
-    }
+    // Always send welcome email on submission
+    recentOnboardedEmails.set(cleanEmail, now);
 
     // 2. Check MySQL Database: If candidate already registered, update details and re-send welcome email
     const [existingUsers] = await pool.execute(

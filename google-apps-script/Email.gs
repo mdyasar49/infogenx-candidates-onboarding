@@ -4,18 +4,9 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
     return;
   }
 
+  // Clean email
   const cleanEmail = email.trim().toLowerCase();
 
-  // -------------------------------------------------------------------
-  // 15-Second Deduplication Lock: Prevents concurrent trigger execution per submit
-  // -------------------------------------------------------------------
-  const cache = CacheService.getScriptCache();
-  const cacheKey = "email_sent_lock_" + cleanEmail;
-  if (cache.get(cacheKey)) {
-    Logger.log("sendWelcomeEmail skipped: Concurrent trigger active for " + cleanEmail);
-    return;
-  }
-  cache.put(cacheKey, "true", 15); // 15-second window lock
 
   const PORTAL_URL = "https://candidates.infogenx.com/login";
   const subject = "Infogenx HR Training Credentials";
