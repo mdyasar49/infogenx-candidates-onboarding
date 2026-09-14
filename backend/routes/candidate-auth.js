@@ -502,16 +502,16 @@ router.post('/onboard-candidate', async (req, res) => {
                 <td style="padding: 36px 32px; color: #00123C;">
                   <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #334155;">Dear Candidate,</p>
                   <p style="margin: 0 0 16px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thank you for completing the registration form.</p>
-                  <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">To proceed with your onboarding, please click the below button or following link <a href="${PORTAL_URL}" target="_blank" style="color: #E65525; font-weight: 700; text-decoration: underline;">Click Here</a> to login in to the HR Training Application using your registered email address and the temporary password provided below:</p>
+                  <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">To proceed with your onboarding, please click the below button or following link <a href="${PORTAL_URL}" target="_blank" style="color: #2563EB; font-weight: 700; text-decoration: underline;">Click Here</a> to login in to the HR Training Application using your registered email address and the temporary password provided below:</p>
                   
-                  <p style="margin: 0 0 12px 0; font-size: 15px; line-height: 1.6; color: #00123C; font-weight: 700;">Application Link: <a href="${PORTAL_URL}" target="_blank" style="color: #E65525; font-weight: 700; text-decoration: underline;">Click Here</a></p>
+                  <p style="margin: 0 0 12px 0; font-size: 15px; line-height: 1.6; color: #00123C; font-weight: 700;">Application Link: <a href="${PORTAL_URL}" target="_blank" style="color: #2563EB; font-weight: 700; text-decoration: underline;">Click Here</a></p>
                   <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #00123C; font-weight: 700;">Password: <span style="color: #E65525; font-family: monospace; font-size: 18px; font-weight: 800; letter-spacing: 0.05em;">${candidatePassword}</span></p>
 
                   <div align="center" style="margin: 28px 0 24px 0;">
                     <a href="${PORTAL_URL}" target="_blank" style="background: linear-gradient(90deg, #00123C 0%, #E65525 100%); color: #FFFFFF !important; text-decoration: none; padding: 15px 42px; border-radius: 10px; font-weight: 700; font-size: 16px; display: inline-block; box-shadow: 0 8px 22px rgba(230, 85, 37, 0.25); text-align: center;">Access to HR Training →</a>
                   </div>
                   <p style="margin: 0 0 12px 0; font-size: 14px; line-height: 1.6; color: #475569;">Please complete the training process at your earliest convenience. If you encounter any issues accessing the portal through the button above, copy and paste the following link directly into your browser:</p>
-                  <p style="margin: 0 0 28px 0; font-size: 14px; text-align: center;"><a href="${PORTAL_URL}" target="_blank" style="color: #E65525; font-weight: 600; text-decoration: underline;">${PORTAL_URL}</a></p>
+                  <p style="margin: 0 0 28px 0; font-size: 14px; text-align: center;"><a href="${PORTAL_URL}" target="_blank" style="color: #2563EB; font-weight: 600; text-decoration: underline;">${PORTAL_URL}</a></p>
                   <p style="margin: 0 0 4px 0; font-size: 15px; line-height: 1.6; color: #334155;">Best regards,</p>
                   <p style="margin: 0; font-size: 15px; font-weight: 700; color: #00123C;">Infogenx Talent Acquisition & HR Operations</p>
                 </td>
