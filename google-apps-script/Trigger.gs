@@ -125,23 +125,15 @@ function onStudentRegistration(e) {
     // -------------------------------------------------------
     // Validate Required Student Information
     // -------------------------------------------------------
-    student.fullName = cleanText(student.fullName) || "Candidate";
+    student.fullName = cleanText(student.fullName);
     student.email = cleanText(student.email).toLowerCase();
     student.mobile = cleanText(student.mobile);
 
-    // Fallback: If email not found in standard fields, scan all extracted values for valid email
-    if (!student.email || !student.email.includes("@")) {
-      for (const k in student) {
-        if (typeof student[k] === "string" && student[k].includes("@")) {
-          student.email = student[k].trim().toLowerCase();
-          break;
-        }
-      }
+    if (!student.fullName) {
+      throw new Error("Full Name is missing from submission.");
     }
-
     if (!student.email || !student.email.includes("@")) {
-      Logger.log("⚠️ Valid Email Address is missing from submission. Cannot dispatch email.");
-      return { success: false, message: "Missing candidate email." };
+      throw new Error("Valid Email Address is missing from submission.");
     }
 
     Logger.log("Processing candidate: " + student.fullName + " <" + student.email + ">");
@@ -207,63 +199,38 @@ function onStudentRegistration(e) {
 function mapFieldToStudent(student, title, answer) {
   if (!title || answer === null || answer === undefined) return;
   const t = title.toLowerCase();
-  const a = typeof answer === "string" ? answer.trim() : (Array.isArray(answer) ? answer.join(", ").trim() : String(answer).trim());
+  const a = typeof answer === "string" ? answer.trim() : String(answer);
 
-  if (a.includes("@") && a.includes(".")) {
-    student.email = a.toLowerCase();
-  }
-
-  if (t.includes("email") || t.includes("mail")) {
-    student.email = a.toLowerCase();
-  } else if (t.includes("name")) {
-    student.fullName = a;
-  } else if (t.includes("birth") || t.includes("dob")) {
-    student.dob = a;
-  } else if (t.includes("mobile") || t.includes("phone") || t.includes("contact")) {
-    student.mobile = a;
-  } else if (t.includes("city") || t.includes("location")) {
-    student.city = a;
-  } else if (t.includes("qualification")) {
-    student.qualification = a;
-  } else if (t.includes("college") || t.includes("collage") || t.includes("university") || t.includes("institution")) {
-    student.college = a;
-  } else if (t.includes("department") || t.includes("branch") || t.includes("stream")) {
-    student.department = a;
-  } else if (t.includes("passing") || t.includes("year")) {
-    student.yearOfPassing = a;
-  } else if (t.includes("category")) {
-    student.skillCategory = a;
-  } else if (t.includes("skills") || t === "skill") {
-    student.skills = a;
-  } else if (t.includes("experience type") || t === "experience" || t.includes("experience")) {
-    student.experienceType = a;
-  } else if (t.includes("company name")) {
-    student.companyName = a;
-  } else if (t.includes("experience (years)") || t.includes("any experience")) {
-    student.experienceYears = a;
-  } else if (t.includes("expected salary")) {
-    student.expectedSalary = a;
-  } else if (t.includes("current monthly") || t.includes("take home") || t.includes("hourly rate") || t.includes("current salary")) {
+  if (t.includes("full name") || t === "name") student.fullName = a;
+  else if (t.includes("birth") || t.includes("dob")) student.dob = a;
+  else if (t.includes("email")) student.email = a;
+  else if (t.includes("mobile") || t.includes("phone") || t.includes("contact")) student.mobile = a;
+  else if (t.includes("city") || t.includes("location")) student.city = a;
+  else if (t.includes("qualification")) student.qualification = a;
+  else if (t.includes("college") || t.includes("collage") || t.includes("university") || t.includes("institution")) student.college = a;
+  else if (t.includes("department") || t.includes("branch") || t.includes("stream")) student.department = a;
+  else if (t.includes("passing") || t.includes("year")) student.yearOfPassing = a;
+  else if (t.includes("category")) student.skillCategory = a;
+  else if (t.includes("skills") || t === "skill") student.skills = a;
+  else if (t.includes("experience type") || t === "experience" || t.includes("experience")) student.experienceType = a;
+  else if (t.includes("company name")) student.companyName = a;
+  else if (t.includes("experience (years)") || t.includes("any experience")) student.experienceYears = a;
+  else if (t.includes("expected salary")) student.expectedSalary = a;
+  else if (t.includes("current monthly") || t.includes("take home") || t.includes("hourly rate") || t.includes("current salary")) {
     student.currentSalary = a;
     student.currentTakeHomeSalaryHourlyRate = a;
-  } else if (t.includes("resume")) {
-    student.resumeLink = a;
-  } else if (t.includes("preferred time") || t.includes("duration & timings") || t.includes("timings you can work") || t.includes("working hours") || t.includes("preferred working")) {
+  }
+  else if (t.includes("resume")) student.resumeLink = a;
+  else if (t.includes("preferred time") || t.includes("duration & timings") || t.includes("timings you can work") || t.includes("working hours") || t.includes("preferred working")) {
     student.preferredTime = a;
     student.workDurationTimings = a;
-  } else if (t.includes("certification")) {
-    student.certification = a;
-  } else if (t.includes("linkedin")) {
-    student.linkedinUrl = a;
-  } else if (t.includes("start date")) {
-    student.startDate = a;
-  } else if (t.includes("work status")) {
-    student.currentWorkStatus = a;
-  } else if (t.includes("if working then") || t.includes("working type")) {
-    student.workingType = a;
-  } else if (t.includes("availability")) {
-    student.preferredAvailability = a;
   }
+  else if (t.includes("certification")) student.certification = a;
+  else if (t.includes("linkedin")) student.linkedinUrl = a;
+  else if (t.includes("start date")) student.startDate = a;
+  else if (t.includes("work status")) student.currentWorkStatus = a;
+  else if (t.includes("if working then") || t.includes("working type")) student.workingType = a;
+  else if (t.includes("availability")) student.preferredAvailability = a;
 }
 
 /**
@@ -332,7 +299,7 @@ function createAllTriggers() {
   const databaseId = TARGET_DATABASE_ID;
   const formId = TARGET_FORM_ID;
   
-  Logger.log("=== Creating All System Triggers ===");
+  Logger.log("=== Creating System Triggers (Single Clean Trigger) ===");
   
   // 1. Auto-Link Form Responses to Google Spreadsheet
   try {
@@ -343,55 +310,43 @@ function createAllTriggers() {
     Logger.log("⚠️ Form destination notice: " + destErr.message);
   }
 
-  // Clean existing triggers
+  // Clean existing triggers for onStudentRegistration & syncSheetResponses
   const triggers = ScriptApp.getProjectTriggers();
   triggers.forEach(function(t) {
-    if (t.getHandlerFunction() === "onStudentRegistration") {
+    const fn = t.getHandlerFunction();
+    if (fn === "onStudentRegistration" || fn === "syncSheetResponses") {
       ScriptApp.deleteTrigger(t);
     }
   });
 
   let createdCount = 0;
 
-  // 2. Create Form Submit Trigger (Google Form)
+  // 2. Create Single Form Submit Trigger (Google Form)
   try {
     const form = FormApp.openById(formId);
     ScriptApp.newTrigger("onStudentRegistration")
       .forForm(form)
       .onFormSubmit()
       .create();
-    Logger.log("✅ [1/2] Google Form Submit Trigger Connected for Form: " + form.getTitle() + " (" + formId + ")");
+    Logger.log("✅ [1/2] Single Google Form Submit Trigger Connected for Form: " + form.getTitle() + " (" + formId + ")");
     createdCount++;
   } catch (fErr) {
     Logger.log("⚠️ Form Trigger Notice: " + fErr.message);
   }
 
-  // 3. Create Spreadsheet Form Submit Trigger (Google Sheet)
-  try {
-    const ss = SpreadsheetApp.openById(databaseId);
-    ScriptApp.newTrigger("onStudentRegistration")
-      .forSpreadsheet(ss)
-      .onFormSubmit()
-      .create();
-    Logger.log("✅ [2/3] Google Spreadsheet Form Submit Trigger Connected for Sheet: " + ss.getName() + " (" + databaseId + ")");
-    createdCount++;
-  } catch (sErr) {
-    Logger.log("⚠️ Spreadsheet Trigger Notice: " + sErr.message);
-  }
-
-  // 4. Create 1-Minute Auto-Sync Fallback Trigger
+  // 3. Create 5-Minute Auto-Sync Fallback Trigger (Prevents 1-min spam/race conditions)
   try {
     ScriptApp.newTrigger("syncSheetResponses")
       .timeBased()
-      .everyMinutes(1)
+      .everyMinutes(5)
       .create();
-    Logger.log("✅ [3/3] 1-Minute Auto-Sync Fallback Trigger Connected!");
+    Logger.log("✅ [2/2] 5-Minute Auto-Sync Fallback Trigger Connected!");
     createdCount++;
   } catch (tErr) {
     Logger.log("⚠️ Time Trigger Notice: " + tErr.message);
   }
 
-  Logger.log("🎉 All Triggers Setup Complete (" + createdCount + " active triggers)!");
+  Logger.log("🎉 Triggers Setup Complete (" + createdCount + " active triggers)!");
   return { success: true, activeTriggers: createdCount };
 }
 
@@ -543,37 +498,4 @@ function testEndToEndRegistration() {
   };
 
   return onStudentRegistration({ student: testStudent });
-}
-
-/**
- * Diagnostic Function for Pinpointing Execution Errors
- */
-function debugTest() {
-  const logs = [];
-  try {
-    logs.push("Step 1: Get Database ID");
-    const dbId = getDatabaseId();
-    logs.push("Database ID: " + dbId);
-
-    logs.push("Step 2: Open Spreadsheet");
-    const ss = SpreadsheetApp.openById(dbId);
-    logs.push("Spreadsheet opened: " + ss.getName());
-
-    logs.push("Step 3: Get Students Sheet");
-    const sheet = getStudentsSheet();
-    logs.push("Students Sheet rows: " + sheet.getLastRow());
-
-    logs.push("Step 4: Generate Password");
-    const pwd = generatePassword("Test Candidate", "2000-01-01");
-    logs.push("Generated Pwd: " + pwd);
-
-    logs.push("Step 5: Send Email Test");
-    sendWelcomeEmail("mdyasardeveloper786@gmail.com", "Test Candidate", pwd, "9876543210", "IT");
-    logs.push("Email sent successfully!");
-
-    return { success: true, logs: logs };
-  } catch (e) {
-    logs.push("ERROR caught: " + e.message + " | Stack: " + e.stack);
-    return { success: false, logs: logs, error: e.message };
-  }
 }

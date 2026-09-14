@@ -4,9 +4,18 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
     return;
   }
 
-  // Clean email
   const cleanEmail = email.trim().toLowerCase();
 
+  // -------------------------------------------------------------------
+  // 15-Second Deduplication Lock: Prevents concurrent trigger execution per submit
+  // -------------------------------------------------------------------
+  const cache = CacheService.getScriptCache();
+  const cacheKey = "email_sent_lock_" + cleanEmail;
+  if (cache.get(cacheKey)) {
+    Logger.log("sendWelcomeEmail skipped: Concurrent trigger active for " + cleanEmail);
+    return;
+  }
+  cache.put(cacheKey, "true", 15); // 15-second window lock
 
   const PORTAL_URL = "https://candidates.infogenx.com/login";
   const subject = "Infogenx HR Training Credentials";
@@ -73,7 +82,12 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
       '</tr>' +
       '</table>' +
       '</div>' +
-      '<p style="margin: 20px 0 0 0; font-size: 13px; color: #94A3B8; text-align: center; line-height: 1.5;">Portal URL: <a href="' + PORTAL_URL + '" target="_blank" style="color: #E65525; text-decoration: underline;">' + PORTAL_URL + '</a></p>' +
+      '<!-- CTA Button -->' +
+      '<div align="center" style="margin: 30px 0 24px 0;">' +
+      '<a href="' + PORTAL_URL + '" target="_blank" style="background: linear-gradient(90deg, #00123C 0%, #E65525 100%); color: #FFFFFF !important; text-decoration: none; padding: 15px 36px; border-radius: 10px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 8px 22px rgba(0, 18, 60, 0.16); text-align: center;">Access Candidate Portal →</a>' +
+      '</div>' +
+      '<!-- Direct Link Fallback -->' +
+      '<p style="margin: 0; font-size: 13px; color: #94A3B8; text-align: center; line-height: 1.5;">If the button above does not work, copy and paste this link into your browser:<br><a href="' + PORTAL_URL + '" target="_blank" style="color: #E65525; text-decoration: underline;">' + PORTAL_URL + '</a></p>' +
       '</td>' +
       '</tr>' +
       '<!-- Unified Footer -->' +
