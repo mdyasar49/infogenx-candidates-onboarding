@@ -30,11 +30,11 @@ async function ensureCandidateUsersTable() {
     // Ensure assessment_attempts and max_attempts columns exist if table was previously created
     try {
       await pool.execute(`ALTER TABLE candidate_users ADD COLUMN assessment_attempts INT DEFAULT 0;`);
-    } catch (colErr) {}
+    } catch (colErr) { }
 
     try {
       await pool.execute(`ALTER TABLE candidate_users ADD COLUMN max_attempts INT DEFAULT 1;`);
-    } catch (colErr) {}
+    } catch (colErr) { }
 
     // Seed or update default accounts: test_user gets max_attempts = -1 (unlimited), candidate gets 1
     await pool.execute(`UPDATE candidate_users SET max_attempts = -1 WHERE role IN ('test_user', 'admin')`);
@@ -100,7 +100,7 @@ router.post('/login', async (req, res) => {
           // Sync candidate password to the latest input credentials
           try {
             await pool.execute(`UPDATE candidate_users SET password = ? WHERE id = ?`, [cleanInputPass, user.id]);
-          } catch (e) {}
+          } catch (e) { }
         }
       }
 
@@ -208,7 +208,7 @@ router.get('/check-attempt', async (req, res) => {
     const isTest = user.role === 'test_user';
     const attempts = user.assessment_attempts || 0;
     const max = user.max_attempts !== null && user.max_attempts !== undefined ? user.max_attempts : (isTest ? -1 : 1);
-    
+
     // Completely dynamic & reusable: -1 means unlimited, otherwise attempts < max
     const canAttempt = max === -1 || isTest || attempts < max;
 
@@ -434,7 +434,7 @@ router.post('/onboard-candidate', async (req, res) => {
   try {
     await ensureCandidateUsersTable();
     const { fullName, email, mobile = '', location = '', qualification = '', dob = '', role = 'candidate' } = req.body;
-    
+
     if (!fullName || !email) {
       return res.status(400).json({ success: false, message: 'Full name and email are required.' });
     }
@@ -501,8 +501,8 @@ router.post('/onboard-candidate', async (req, res) => {
               <tr>
                 <td style="padding: 36px 32px; color: #00123C;">
                   <h2 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 800; color: #00123C;">Application Received Successfully 🎉</h2>
-                  <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">Dear <strong>${fullName}</strong>,</p>
-                  <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thank you for applying to Infogenx. Your candidate onboarding account is now active. Please use the credentials below to log in and complete your assessment.</p>
+                  <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">Dear Candidate,</p>
+                  <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thanks for filling out this form. Please log in to the HR Training Application through the following link using your registered email ID and the following password to complete the entire training process.</p>
                   
                   <div style="background-color: #FFF8F3; border: 1.5px solid rgba(230, 85, 37, 0.25); border-radius: 12px; padding: 22px; margin-bottom: 26px;">
                     <h3 style="margin: 0 0 14px 0; font-size: 16px; font-weight: 800; color: #E65525;">Your Login Credentials</h3>
@@ -515,15 +515,9 @@ router.post('/onboard-candidate', async (req, res) => {
                         <td style="padding: 6px 0; color: #5C6A86; font-weight: 600;">Generated Password:</td>
                         <td style="padding: 6px 0; color: #E65525; font-weight: 800; font-family: monospace; font-size: 18px; letter-spacing: 0.05em;">${candidatePassword}</td>
                       </tr>
-                      <tr>
-                        <td style="padding: 6px 0; color: #5C6A86; font-weight: 600;">Exam Attempts:</td>
-                        <td style="padding: 6px 0; color: #00123C; font-weight: 700;">Strictly 1 Attempt Allowed</td>
-                      </tr>
                     </table>
                   </div>
 
-                  <p style="margin: 0 0 28px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thanks for filling out this form, Please login to the HR Training Applicaiton with below user name and password and complete all training Process</p>
-                  
                   <div align="center" style="margin: 30px 0 24px 0;">
                     <a href="${PORTAL_URL}" target="_blank" style="background: linear-gradient(90deg, #00123C 0%, #E65525 100%); color: #FFFFFF !important; text-decoration: none; padding: 15px 36px; border-radius: 10px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 8px 22px rgba(0, 18, 60, 0.16); text-align: center;">Access Candidate Assessment Portal →</a>
                   </div>
@@ -547,7 +541,7 @@ router.post('/onboard-candidate', async (req, res) => {
     `;
 
     await transporter.sendMail({
-      from: '"Infogenx Recruitment Operations" <infogenx.dm@gmail.com>',
+      from: '"Infogenx" <infogenx.dm@gmail.com>',
       to: cleanEmail,
       subject: 'Application Received Successfully - Infogenx Candidate Assessment Portal',
       html: htmlContent

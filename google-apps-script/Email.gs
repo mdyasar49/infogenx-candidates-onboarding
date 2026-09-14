@@ -87,8 +87,8 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
         '<tr>' +
         '<td style="padding: 36px 32px; color: #00123C;">' +
         '<h2 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 800; color: #00123C;">Application Received Successfully 🎉</h2>' +
-        '<p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">Dear <strong>' + fullName + '</strong>,</p>' +
-        '<p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thank you for submitting your candidate application to Infogenx. Your profile has been registered in our system, and your candidate onboarding account is now active.</p>' +
+        '<p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">Dear Candidate,</p>' +
+        '<p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thanks for filling out this form. Please log in to the HR Training Application through the following link using your registered email ID and the following password to complete the entire training process.</p>' +
         '<!-- Credentials Box -->' +
         '<div style="background-color: #FFF8F3; border: 1.5px solid rgba(230, 85, 37, 0.25); border-radius: 12px; padding: 22px; margin-bottom: 26px;">' +
         '<h3 style="margin: 0 0 14px 0; font-size: 16px; font-weight: 800; color: #E65525;">Your Login Credentials</h3>' +
@@ -103,8 +103,6 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
         '</tr>' +
         '</table>' +
         '</div>' +
-        '<!-- Instruction -->' +
-        '<p style="margin: 0 0 28px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thanks for filling out this form, Please login to the HR Training Applicaiton with below user name and password and complete all training Process</p>' +
         '<!-- CTA Button -->' +
         '<div align="center" style="margin: 30px 0 24px 0;">' +
         '<a href="' + PORTAL_URL + '" target="_blank" style="background: linear-gradient(90deg, #00123C 0%, #E65525 100%); color: #FFFFFF !important; text-decoration: none; padding: 15px 36px; border-radius: 10px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 8px 22px rgba(0, 18, 60, 0.16); text-align: center;">Access Candidate Portal →</a>' +
@@ -128,8 +126,8 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
         '</body>' +
         '</html>';
 
-      const plainTextBody = "Dear " + fullName + ",\n\n" +
-        "Thanks for filling out this form, Please login to the HR Training Applicaiton with below user name and password and complete all training Process\n\n" +
+      const plainTextBody = "Dear Candidate,\n\n" +
+        "Thanks for filling out this form. Please log in to the HR Training Application through the following link using your registered email ID and the following password to complete the entire training process.\n\n" +
         "Registered Email: " + cleanEmail + "\n" +
         "Generated Password: " + password + "\n\n" +
         "Portal Link: " + PORTAL_URL + "\n\n" +
@@ -137,7 +135,7 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
 
       GmailApp.sendEmail(cleanEmail, subject, plainTextBody, {
         htmlBody: htmlBody,
-        name: "Infogenx Candidate Portal"
+        name: "Infogenx"
       });
       Logger.log("✅ GmailApp sendEmail completed for: " + cleanEmail);
     } catch (gmailErr) {
