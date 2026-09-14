@@ -125,15 +125,23 @@ function onStudentRegistration(e) {
     // -------------------------------------------------------
     // Validate Required Student Information
     // -------------------------------------------------------
-    student.fullName = cleanText(student.fullName);
+    student.fullName = cleanText(student.fullName) || "Candidate";
     student.email = cleanText(student.email).toLowerCase();
     student.mobile = cleanText(student.mobile);
 
-    if (!student.fullName) {
-      throw new Error("Full Name is missing from submission.");
-    }
+    // Fallback: If email not found in standard fields, scan all extracted values for valid email
     if (!student.email || !student.email.includes("@")) {
-      throw new Error("Valid Email Address is missing from submission.");
+      for (const k in student) {
+        if (typeof student[k] === "string" && student[k].includes("@")) {
+          student.email = student[k].trim().toLowerCase();
+          break;
+        }
+      }
+    }
+
+    if (!student.email || !student.email.includes("@")) {
+      Logger.log("⚠️ Valid Email Address is missing from submission. Cannot dispatch email.");
+      return { success: false, message: "Missing candidate email." };
     }
 
     Logger.log("Processing candidate: " + student.fullName + " <" + student.email + ">");
@@ -201,7 +209,7 @@ function mapFieldToStudent(student, title, answer) {
   const t = title.toLowerCase();
   const a = typeof answer === "string" ? answer.trim() : String(answer);
 
-  if (t.includes("full name") || t === "name") student.fullName = a;
+  if (t.includes("name")) student.fullName = a;
   else if (t.includes("birth") || t.includes("dob")) student.dob = a;
   else if (t.includes("email")) student.email = a;
   else if (t.includes("mobile") || t.includes("phone") || t.includes("contact")) student.mobile = a;
@@ -299,7 +307,7 @@ function createAllTriggers() {
   const databaseId = TARGET_DATABASE_ID;
   const formId = TARGET_FORM_ID;
   
-  Logger.log("=== Creating System Triggers (Single Clean Trigger) ===");
+  Logger.log("=== Creating All System Triggers ===");
   
   // 1. Auto-Link Form Responses to Google Spreadsheet
   try {
@@ -310,43 +318,55 @@ function createAllTriggers() {
     Logger.log("⚠️ Form destination notice: " + destErr.message);
   }
 
-  // Clean existing triggers for onStudentRegistration & syncSheetResponses
+  // Clean existing triggers
   const triggers = ScriptApp.getProjectTriggers();
   triggers.forEach(function(t) {
-    const fn = t.getHandlerFunction();
-    if (fn === "onStudentRegistration" || fn === "syncSheetResponses") {
+    if (t.getHandlerFunction() === "onStudentRegistration") {
       ScriptApp.deleteTrigger(t);
     }
   });
 
   let createdCount = 0;
 
-  // 2. Create Single Form Submit Trigger (Google Form)
+  // 2. Create Form Submit Trigger (Google Form)
   try {
     const form = FormApp.openById(formId);
     ScriptApp.newTrigger("onStudentRegistration")
       .forForm(form)
       .onFormSubmit()
       .create();
-    Logger.log("✅ [1/2] Single Google Form Submit Trigger Connected for Form: " + form.getTitle() + " (" + formId + ")");
+    Logger.log("✅ [1/2] Google Form Submit Trigger Connected for Form: " + form.getTitle() + " (" + formId + ")");
     createdCount++;
   } catch (fErr) {
     Logger.log("⚠️ Form Trigger Notice: " + fErr.message);
   }
 
-  // 3. Create 5-Minute Auto-Sync Fallback Trigger (Prevents 1-min spam/race conditions)
+  // 3. Create Spreadsheet Form Submit Trigger (Google Sheet)
+  try {
+    const ss = SpreadsheetApp.openById(databaseId);
+    ScriptApp.newTrigger("onStudentRegistration")
+      .forSpreadsheet(ss)
+      .onFormSubmit()
+      .create();
+    Logger.log("✅ [2/3] Google Spreadsheet Form Submit Trigger Connected for Sheet: " + ss.getName() + " (" + databaseId + ")");
+    createdCount++;
+  } catch (sErr) {
+    Logger.log("⚠️ Spreadsheet Trigger Notice: " + sErr.message);
+  }
+
+  // 4. Create 1-Minute Auto-Sync Fallback Trigger
   try {
     ScriptApp.newTrigger("syncSheetResponses")
       .timeBased()
-      .everyMinutes(5)
+      .everyMinutes(1)
       .create();
-    Logger.log("✅ [2/2] 5-Minute Auto-Sync Fallback Trigger Connected!");
+    Logger.log("✅ [3/3] 1-Minute Auto-Sync Fallback Trigger Connected!");
     createdCount++;
   } catch (tErr) {
     Logger.log("⚠️ Time Trigger Notice: " + tErr.message);
   }
 
-  Logger.log("🎉 Triggers Setup Complete (" + createdCount + " active triggers)!");
+  Logger.log("🎉 All Triggers Setup Complete (" + createdCount + " active triggers)!");
   return { success: true, activeTriggers: createdCount };
 }
 
