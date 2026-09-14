@@ -500,7 +500,6 @@ router.post('/onboard-candidate', async (req, res) => {
               </tr>
               <tr>
                 <td style="padding: 36px 32px; color: #00123C;">
-                  <h2 style="margin: 0 0 16px 0; font-size: 22px; font-weight: 800; color: #00123C;">Application Received Successfully 🎉</h2>
                   <p style="margin: 0 0 20px 0; font-size: 15px; line-height: 1.6; color: #334155;">Dear Candidate,</p>
                   <p style="margin: 0 0 24px 0; font-size: 15px; line-height: 1.6; color: #334155;">Thanks for filling out this form. Please log in to the HR Training Application through the following link using your registered email ID and the following password to complete the entire training process.</p>
                   
@@ -508,11 +507,7 @@ router.post('/onboard-candidate', async (req, res) => {
                     <h3 style="margin: 0 0 14px 0; font-size: 16px; font-weight: 800; color: #E65525;">Your Login Credentials</h3>
                     <table border="0" cellpadding="0" cellspacing="0" width="100%" style="font-size: 14px;">
                       <tr>
-                        <td style="padding: 6px 0; color: #5C6A86; font-weight: 600; width: 140px;">Registered Email:</td>
-                        <td style="padding: 6px 0; color: #00123C; font-weight: 700;">${cleanEmail}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; color: #5C6A86; font-weight: 600;">Generated Password:</td>
+                        <td style="padding: 6px 0; color: #5C6A86; font-weight: 600; width: 140px;">Generated Password:</td>
                         <td style="padding: 6px 0; color: #E65525; font-weight: 800; font-family: monospace; font-size: 18px; letter-spacing: 0.05em;">${candidatePassword}</td>
                       </tr>
                     </table>
