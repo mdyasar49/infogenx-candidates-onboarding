@@ -442,22 +442,36 @@ router.post('/onboard-candidate', async (req, res) => {
     const cleanEmail = email.trim().toLowerCase();
     const now = Date.now();
 
-    // Check 15-minute deduplication lock to prevent duplicate emails
+    // 1. Check in-memory 15-minute deduplication lock
     if (recentOnboardedEmails.has(cleanEmail)) {
       const lastSentTime = recentOnboardedEmails.get(cleanEmail);
       if (now - lastSentTime < 15 * 60 * 1000) {
-        console.log(`[Onboard] Skipped duplicate welcome email for ${cleanEmail} (sent <15 mins ago).`);
-        return res.status(200).json({ success: true, message: 'Candidate onboarded successfully (duplicate email suppressed).' });
+        console.log(`[Onboard] Skipped duplicate welcome email for ${cleanEmail} (memory lock).`);
+        return res.status(200).json({ success: true, message: 'Candidate onboarded (duplicate email suppressed).' });
       }
+    }
+
+    // 2. Check MySQL Database: If candidate already registered, suppress email!
+    const [existingUsers] = await pool.execute(
+      `SELECT id FROM candidate_users WHERE email = ?`,
+      [cleanEmail]
+    );
+
+    if (existingUsers.length > 0) {
+      console.log(`[Onboard] Candidate ${cleanEmail} already exists in MySQL. Suppressing duplicate welcome email.`);
+      recentOnboardedEmails.set(cleanEmail, now);
+      return res.status(200).json({
+        success: true,
+        message: 'Candidate already registered in database. Duplicate welcome email suppressed.'
+      });
     }
 
     const candidatePassword = req.body.password || computeCandidatePassword(fullName, dob);
 
-    // Save/Update in cPanel MySQL
+    // Save/Insert into cPanel MySQL
     await pool.execute(
       `INSERT INTO candidate_users (name, email, password, role, mobile, location, qualification, max_attempts)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 1)
-       ON DUPLICATE KEY UPDATE name = VALUES(name), password = VALUES(password), mobile = VALUES(mobile), location = VALUES(location), qualification = VALUES(qualification)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
       [fullName, cleanEmail, candidatePassword, role, mobile, location, qualification]
     );
 
