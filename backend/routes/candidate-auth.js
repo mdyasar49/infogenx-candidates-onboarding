@@ -451,29 +451,29 @@ router.post('/onboard-candidate', async (req, res) => {
       }
     }
 
-    // 2. Check MySQL Database: If candidate already registered, suppress email!
+    // 2. Check MySQL Database: If candidate already registered, update details and re-send welcome email
     const [existingUsers] = await pool.execute(
-      `SELECT id FROM candidate_users WHERE email = ?`,
+      `SELECT id, password FROM candidate_users WHERE email = ?`,
       [cleanEmail]
     );
 
+    let candidatePassword = req.body.password || computeCandidatePassword(fullName, dob);
+
     if (existingUsers.length > 0) {
-      console.log(`[Onboard] Candidate ${cleanEmail} already exists in MySQL. Suppressing duplicate welcome email.`);
-      recentOnboardedEmails.set(cleanEmail, now);
-      return res.status(200).json({
-        success: true,
-        message: 'Candidate already registered in database. Duplicate welcome email suppressed.'
-      });
+      console.log(`[Onboard] Candidate ${cleanEmail} already exists in MySQL. Updating credentials and re-sending welcome email.`);
+      candidatePassword = existingUsers[0].password || candidatePassword;
+      await pool.execute(
+        `UPDATE candidate_users SET name = ?, password = ?, mobile = COALESCE(NULLIF(?, ''), mobile), location = COALESCE(NULLIF(?, ''), location), qualification = COALESCE(NULLIF(?, ''), qualification) WHERE email = ?`,
+        [fullName, candidatePassword, mobile, location, qualification, cleanEmail]
+      );
+    } else {
+      // Save/Insert into cPanel MySQL
+      await pool.execute(
+        `INSERT INTO candidate_users (name, email, password, role, mobile, location, qualification, max_attempts)
+         VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+        [fullName, cleanEmail, candidatePassword, role, mobile, location, qualification]
+      );
     }
-
-    const candidatePassword = req.body.password || computeCandidatePassword(fullName, dob);
-
-    // Save/Insert into cPanel MySQL
-    await pool.execute(
-      `INSERT INTO candidate_users (name, email, password, role, mobile, location, qualification, max_attempts)
-       VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
-      [fullName, cleanEmail, candidatePassword, role, mobile, location, qualification]
-    );
 
     recentOnboardedEmails.set(cleanEmail, now);
 

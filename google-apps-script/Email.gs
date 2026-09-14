@@ -7,25 +7,15 @@ function sendWelcomeEmail(email, fullName, password, mobile, skillCategory) {
   const cleanEmail = email.trim().toLowerCase();
 
   // -------------------------------------------------------------------
-  // ATOMIC PERSISTENT LOCK: Prevent duplicate emails globally across all triggers
+  // 15-Second Deduplication Lock: Prevents concurrent trigger execution per submit
   // -------------------------------------------------------------------
-  const scriptProperties = PropertiesService.getScriptProperties();
-  const propKey = "email_sent_" + cleanEmail;
-  if (scriptProperties.getProperty(propKey)) {
-    Logger.log("sendWelcomeEmail skipped: Email already sent to " + cleanEmail + " (PropertiesService lock active).");
-    return;
-  }
-
   const cache = CacheService.getScriptCache();
-  const cacheKey = "email_sent_cache_" + cleanEmail;
+  const cacheKey = "email_sent_lock_" + cleanEmail;
   if (cache.get(cacheKey)) {
-    Logger.log("sendWelcomeEmail skipped: Email already sent to " + cleanEmail + " (CacheService lock active).");
+    Logger.log("sendWelcomeEmail skipped: Concurrent trigger active for " + cleanEmail);
     return;
   }
-
-  // Set atomic locks before dispatching
-  scriptProperties.setProperty(propKey, new Date().toISOString());
-  cache.put(cacheKey, "true", 1800); // 30-minute cache lock
+  cache.put(cacheKey, "true", 15); // 15-second window lock
 
   const PORTAL_URL = "https://candidates.infogenx.com/login";
   const BACKUP_PORTAL_URL = "https://infogenx-candidates-onboarding.netlify.app/login";
