@@ -428,6 +428,8 @@ function computeCandidatePassword(name, dob) {
   return `${prefix}${year}`;
 }
 
+const recentOnboardedEmails = new Map();
+
 router.post('/onboard-candidate', async (req, res) => {
   try {
     await ensureCandidateUsersTable();
@@ -438,6 +440,17 @@ router.post('/onboard-candidate', async (req, res) => {
     }
 
     const cleanEmail = email.trim().toLowerCase();
+    const now = Date.now();
+
+    // Check 15-minute deduplication lock to prevent duplicate emails
+    if (recentOnboardedEmails.has(cleanEmail)) {
+      const lastSentTime = recentOnboardedEmails.get(cleanEmail);
+      if (now - lastSentTime < 15 * 60 * 1000) {
+        console.log(`[Onboard] Skipped duplicate welcome email for ${cleanEmail} (sent <15 mins ago).`);
+        return res.status(200).json({ success: true, message: 'Candidate onboarded successfully (duplicate email suppressed).' });
+      }
+    }
+
     const candidatePassword = req.body.password || computeCandidatePassword(fullName, dob);
 
     // Save/Update in cPanel MySQL
@@ -447,6 +460,8 @@ router.post('/onboard-candidate', async (req, res) => {
        ON DUPLICATE KEY UPDATE name = VALUES(name), password = VALUES(password), mobile = VALUES(mobile), location = VALUES(location), qualification = VALUES(qualification)`,
       [fullName, cleanEmail, candidatePassword, role, mobile, location, qualification]
     );
+
+    recentOnboardedEmails.set(cleanEmail, now);
 
     // Send Welcome Email
     const PORTAL_URL = 'https://candidates.infogenx.com/login';
