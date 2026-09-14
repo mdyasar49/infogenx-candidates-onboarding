@@ -513,10 +513,7 @@ router.post('/onboard-candidate', async (req, res) => {
                     </table>
                   </div>
 
-                  <div align="center" style="margin: 30px 0 24px 0;">
-                    <a href="${PORTAL_URL}" target="_blank" style="background: linear-gradient(90deg, #00123C 0%, #E65525 100%); color: #FFFFFF !important; text-decoration: none; padding: 15px 36px; border-radius: 10px; font-weight: 700; font-size: 15px; display: inline-block; box-shadow: 0 8px 22px rgba(0, 18, 60, 0.16); text-align: center;">Access Candidate Assessment Portal →</a>
-                  </div>
-                  <p style="margin: 0; font-size: 13px; color: #94A3B8; text-align: center;">Portal URL: <a href="${PORTAL_URL}" style="color: #E65525;">${PORTAL_URL}</a></p>
+                  <p style="margin: 20px 0 0 0; font-size: 13px; color: #94A3B8; text-align: center;">Portal URL: <a href="${PORTAL_URL}" style="color: #E65525;">${PORTAL_URL}</a></p>
                 </td>
               </tr>
               <!-- Unified Footer -->
