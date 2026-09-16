@@ -501,11 +501,17 @@ router.post('/onboard-candidate', async (req, res) => {
       portalUrl: PORTAL_URL
     });
 
+    const uniqueId = `${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
     await transporter.sendMail({
       from: '"Infogenx HR Operations" <infogenx.dm@gmail.com>',
       to: cleanEmail,
       subject: 'Infogenx HR Training Credentials - INFOGENX Candidate Onboarding & Assessment Portal',
-      html: htmlContent
+      html: htmlContent,
+      messageId: `<onboard-${uniqueId}@candidates.infogenx.com>`,
+      headers: {
+        'X-Entity-Ref-ID': `onboard-${uniqueId}`,
+        'X-Auto-Response-Suppress': 'OOF, AutoReply'
+      }
     });
 
     console.log(`[CandidateAuth] Latest design welcome email delivered to ${cleanEmail}`);

@@ -7,7 +7,7 @@ if sys.platform == "win32":
 form_url = "https://docs.google.com/forms/d/e/1FAIpQLSdAffcQaR1oRuv_NwT5D-MrnGbjPq0EE_cka6jAZ5FjEgt0WA/formResponse"
 
 payload = {
-    "emailAddress": "infogenx.jobs@gmail.com",
+    "emailAddress": "mdyasardeveloper786@gmail.com",
     "entry.1962508159": "HR Intern Candidate",
     "entry.2094768511_year": "2001",
     "entry.2094768511_month": "05",
