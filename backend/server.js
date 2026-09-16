@@ -20,7 +20,6 @@ const app = express();
 
 const allowedOrigins = [
   "https://candidates.infogenx.com",
-  "https://infogenx-candidates-onboarding.netlify.app",
   "http://localhost:5173",
   "http://localhost:5174",
   "http://localhost:3000",
