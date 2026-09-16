@@ -207,7 +207,7 @@ function onStudentRegistration(e) {
     Logger.log("Candidate saved successfully. Generated Password: " + generatedPassword);
 
     // -------------------------------------------------------
-    // 2. Dispatch Welcome Email (via GmailApp & Backend API)
+    // 2. Dispatch Welcome Email (via Node Backend API)
     // -------------------------------------------------------
     try {
       sendWelcomeEmail(student.email, student.fullName, generatedPassword, student.mobile, student.skillCategory);
@@ -506,7 +506,7 @@ function syncSheetResponses() {
         saveStudent(student);
       } catch (saveErr) {}
 
-      // 2. Dispatch Welcome Email via backend API and GmailApp
+      // 2. Dispatch Welcome Email via backend API
       try {
         sendWelcomeEmail(student.email, student.fullName, generatedPassword, student.mobile, student.skillCategory);
       } catch (mailErr) {}
