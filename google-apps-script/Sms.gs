@@ -89,7 +89,7 @@ Welcome to Infogenx.
 Your registration has been completed successfully.
 
 Login Portal:
-https://infogenx-candidates-onboarding.netlify.app/
+https://candidates.infogenx.com/login
 
 Email:
 ${student.email}
