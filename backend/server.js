@@ -1,20 +1,12 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
-import loginRouter from "./routes/login.js";
 import candidateAuthRouter from "./routes/candidate-auth.js";
 import assessmentRouter from "./routes/assessment.js";
 import taskRouter from "./routes/task.js";
 import offerLetterRouter from "./routes/offerLetter.js";
 
-import path from "path";
-import { fileURLToPath } from "url";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-dotenv.config({ path: path.join(__dirname, ".env") });
-dotenv.config();
 
 const app = express();
 
@@ -31,7 +23,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(null, true); // Permissive for onboarding client
+      callback(new Error("CORS: Origin not allowed"), false);
     }
   },
   credentials: true,
@@ -50,7 +42,6 @@ app.get(["/", "/api", "/api/"], (req, res) => {
   });
 });
 
-app.use("/api", loginRouter);
 app.use("/api/candidate-auth", candidateAuthRouter);
 app.use("/api/assessment", assessmentRouter);
 app.use("/api/task", taskRouter);
