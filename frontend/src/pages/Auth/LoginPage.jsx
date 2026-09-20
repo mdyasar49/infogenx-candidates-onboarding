@@ -172,6 +172,20 @@ function LoginPage() {
             <button type="submit" className="login-button" disabled={loading}>
               {loading ? 'Signing In...' : 'Login'}
             </button>
+
+            <div className="login-form-helper">
+              <p>
+                Haven't applied yet?{' '}
+                <a
+                  href="https://docs.google.com/forms/d/e/1FAIpQLSdAffcQaR1oRuv_NwT5D-MrnGbjPq0EE_cka6jAZ5FjEgt0WA/viewform?usp=sharing&ouid=101109227624004877778"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="register-form-link"
+                >
+                  Fill Candidate Application Form →
+                </a>
+              </p>
+            </div>
           </form>
         </div>
       </main>

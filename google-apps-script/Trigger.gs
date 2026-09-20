@@ -15,7 +15,7 @@
 // Google Form: https://docs.google.com/forms/d/e/1FAIpQLSdAffcQaR1oRuv_NwT5D-MrnGbjPq0EE_cka6jAZ5FjEgt0WA/viewform
 const TARGET_FORM_ID = "1ugPH89EBC1RSVJrrHKs3qnYnyR3y5rXAVwK43wamthE";
 const TARGET_DATABASE_ID = "1tEjn1hJ0rd2pNV3kaLyv4SitFyoRLwCKb5loAdEvjoM";
-const PRIMARY_PROJECT_ID = "1u1_v1sF907CLG4Yk33NHYMQEtNnpgENiNq4CHqAbUMLHmioZAjvJVzC4";
+const PRIMARY_PROJECT_ID = "1KCvVM5_9iTYM484tL7Y2TeZq4QFR6EeA7xMpSwLnMolNTXQk3L_PBPww";
 
 function isPrimaryProject() {
   try {
@@ -255,22 +255,22 @@ function onStudentRegistration(e) {
  */
 function mapFieldToStudent(student, title, answer) {
   if (!title || answer === null || answer === undefined) return;
-  const t = title.toLowerCase();
+  const t = title.toLowerCase().trim();
   const a = typeof answer === "string" ? answer.trim() : String(answer);
 
-  if (t.includes("full name") || t.includes("name")) student.fullName = a;
+  if (t.includes("company name") || t.includes("company")) student.companyName = a;
+  else if (t.includes("college") || t.includes("collage") || t.includes("university") || t.includes("institution")) student.college = a;
+  else if (t === "name" || t.includes("full name") || t.includes("candidate name") || t.includes("your name")) student.fullName = a;
   else if (t.includes("birth") || t.includes("dob")) student.dob = a;
   else if (t.includes("email") || (a.includes("@") && a.includes("."))) student.email = a.toLowerCase();
   else if (t.includes("mobile") || t.includes("phone") || t.includes("contact")) student.mobile = a;
   else if (t.includes("city") || t.includes("location")) student.city = a;
   else if (t.includes("qualification")) student.qualification = a;
-  else if (t.includes("college") || t.includes("collage") || t.includes("university") || t.includes("institution")) student.college = a;
   else if (t.includes("department") || t.includes("branch") || t.includes("stream")) student.department = a;
   else if (t.includes("passing") || t.includes("year")) student.yearOfPassing = a;
   else if (t.includes("category")) student.skillCategory = a;
   else if (t.includes("skills") || t === "skill") student.skills = a;
-  else if (t.includes("experience type") || t === "experience" || t.includes("experience")) student.experienceType = a;
-  else if (t.includes("company name")) student.companyName = a;
+  else if (t.includes("experience type") || t === "experience") student.experienceType = a;
   else if (t.includes("experience (years)") || t.includes("any experience")) student.experienceYears = a;
   else if (t.includes("expected salary")) student.expectedSalary = a;
   else if (t.includes("current monthly") || t.includes("take home") || t.includes("hourly rate") || t.includes("current salary")) {
@@ -412,8 +412,8 @@ function createAllTriggers() {
  * Runs every 1 minute to guarantee 100% delivery even if form event triggers delay!
  */
 function syncSheetResponses() {
+  const databaseId = TARGET_DATABASE_ID;
   try {
-    const databaseId = TARGET_DATABASE_ID;
     const ss = SpreadsheetApp.openById(databaseId);
     const sheets = ss.getSheets();
     
@@ -429,10 +429,10 @@ function syncSheetResponses() {
     if (!responseSheet && sheets.length > 0) {
       responseSheet = sheets[0];
     }
-    if (!responseSheet) return;
+    if (!responseSheet) return { success: true, processed: 0 };
 
     const data = responseSheet.getDataRange().getValues();
-    if (data.length < 2) return;
+    if (data.length < 2) return { success: true, processed: 0 };
 
     const headers = data[0].map(function(h) { return String(h).trim().toLowerCase(); });
     
@@ -449,77 +449,79 @@ function syncSheetResponses() {
       responseSheet.getRange(1, passColIdx + 1).setValue("Generated Password").setFontWeight("bold");
     }
 
-    for (let r = 1; r < data.length; r++) {
-      const row = data[r];
-      const currentStatus = String(row[statusColIdx] || "").trim().toUpperCase();
-      if (currentStatus === "PROCESSED") continue;
+    const startRow = Math.max(1, data.length - 15);
+    for (let r = startRow; r < data.length; r++) {
+        const row = data[r];
+        const currentStatus = String(row[statusColIdx] || "").trim().toUpperCase();
+        if (currentStatus === "PROCESSED") continue;
 
-      // Extract fields from row based on headers
-      const student = {
-        fullName: "",
-        email: "",
-        mobile: "",
-        city: "",
-        qualification: "",
-        college: "",
-        department: "",
-        yearOfPassing: "",
-        skillCategory: "HR Intern",
-        skills: "",
-        experienceType: "",
-        companyName: "",
-        experienceYears: "",
-        currentSalary: "",
-        expectedSalary: "",
-        resumeLink: "",
-        preferredTime: "",
-        certification: "",
-        linkedinUrl: "",
-        workDurationTimings: "",
-        startDate: "",
-        currentTakeHomeSalaryHourlyRate: "",
-        currentWorkStatus: "",
-        workingType: "",
-        preferredAvailability: ""
-      };
+        // Extract fields from row based on headers
+        const student = {
+          fullName: "",
+          email: "",
+          mobile: "",
+          city: "",
+          qualification: "",
+          college: "",
+          department: "",
+          yearOfPassing: "",
+          skillCategory: "HR Intern",
+          skills: "",
+          experienceType: "",
+          companyName: "",
+          experienceYears: "",
+          currentSalary: "",
+          expectedSalary: "",
+          resumeLink: "",
+          preferredTime: "",
+          certification: "",
+          linkedinUrl: "",
+          workDurationTimings: "",
+          startDate: "",
+          currentTakeHomeSalaryHourlyRate: "",
+          currentWorkStatus: "",
+          workingType: "",
+          preferredAvailability: ""
+        };
 
-      for (let c = 0; c < headers.length; c++) {
-        const val = row[c];
-        const h = headers[c];
-        mapFieldToStudent(student, h, val);
+        for (let c = 0; c < headers.length; c++) {
+          const val = row[c];
+          const h = headers[c];
+          mapFieldToStudent(student, h, val);
+        }
+
+        if (!student.email || !student.email.includes("@")) {
+          continue;
+        }
+        if (!student.fullName) student.fullName = "Candidate";
+
+        Logger.log("Auto-syncing candidate: " + student.fullName + " <" + student.email + ">");
+
+        // 1. Save to main database sheet
+        let generatedPassword = "";
+        try {
+          const saveRes = saveStudent(student);
+          generatedPassword = (saveRes && saveRes.password) ? saveRes.password : generatePassword(student.fullName, student.dob);
+        } catch (saveErr) {
+          generatedPassword = generatePassword(student.fullName, student.dob);
+        }
+
+        // 2. Dispatch Welcome Email via backend API
+        try {
+          sendWelcomeEmail(student.email, student.fullName, generatedPassword, student.mobile, student.skillCategory);
+        } catch (mailErr) {}
+
+        // 3. Mark processed in responses sheet
+        responseSheet.getRange(r + 1, statusColIdx + 1).setValue("PROCESSED");
+        responseSheet.getRange(r + 1, passColIdx + 1).setValue(generatedPassword);
+        Logger.log("✅ Candidate " + student.email + " onboarded with password: " + generatedPassword);
       }
-
-      if (!student.email || !student.email.includes("@")) {
-        continue;
-      }
-      if (!student.fullName) student.fullName = "Candidate";
-
-      Logger.log("Auto-syncing candidate: " + student.fullName + " <" + student.email + ">");
-
-      // Generate password
-      const cleanName = student.fullName.replace(/[^a-zA-Z]/g, "").toUpperCase();
-      const prefix = cleanName.length >= 4 ? cleanName.substring(0, 4) : (cleanName + "INFO").substring(0, 4);
-      const generatedPassword = prefix + Math.floor(1000 + Math.random() * 9000);
-
-      // 1. Save to main database sheet if needed
-      try {
-        saveStudent(student);
-      } catch (saveErr) {}
-
-      // 2. Dispatch Welcome Email via backend API
-      try {
-        sendWelcomeEmail(student.email, student.fullName, generatedPassword, student.mobile, student.skillCategory);
-      } catch (mailErr) {}
-
-      // 3. Mark processed in responses sheet
-      responseSheet.getRange(r + 1, statusColIdx + 1).setValue("PROCESSED");
-      responseSheet.getRange(r + 1, passColIdx + 1).setValue(generatedPassword);
-      Logger.log("✅ Candidate " + student.email + " onboarded with password: " + generatedPassword);
+      return { success: true };
+    } catch (err) {
+      Logger.log("Error in syncSheetResponses: " + err.message);
+      return { success: false, error: err.message };
     }
-  } catch (err) {
-    Logger.log("Error in syncSheetResponses: " + err.message);
   }
-}
 
 /**
  * Test function that executes a full simulated registration
@@ -555,4 +557,91 @@ function testEndToEndRegistration() {
   };
 
   return onStudentRegistration({ student: testStudent });
+}
+
+/**
+ * Direct Google Form Ingestion:
+ * Reads all submissions directly from the Google Form itself and writes them to the Google Sheet!
+ */
+function syncFormResponsesDirect() {
+  const formId = TARGET_FORM_ID;
+  const databaseId = TARGET_DATABASE_ID;
+  
+  // 1. Link form destination to spreadsheet
+  try {
+    const form = FormApp.openById(formId);
+    form.setDestination(FormApp.DestinationType.SPREADSHEET, databaseId);
+  } catch (destErr) {
+    Logger.log("Form destination link note: " + destErr.message);
+  }
+
+  // 2. Fetch all Form responses directly from FormApp
+  let synced = 0;
+  const logs = [];
+  try {
+    const form = FormApp.openById(formId);
+    const formResponses = form.getResponses();
+    const recentResponses = formResponses.length > 10 ? formResponses.slice(-10) : formResponses;
+    recentResponses.forEach(function(response) {
+      const student = {
+        fullName: "",
+        dob: "",
+        email: "",
+        mobile: "",
+        city: "",
+        qualification: "",
+        college: "",
+        department: "",
+        yearOfPassing: "",
+        skillCategory: "Non IT",
+        skills: "",
+        experienceType: "",
+        companyName: "",
+        experienceYears: "",
+        currentSalary: "",
+        expectedSalary: "",
+        resumeLink: "",
+        preferredTime: "",
+        certification: "",
+        linkedinUrl: "",
+        workDurationTimings: "",
+        startDate: "",
+        currentTakeHomeSalaryHourlyRate: "",
+        currentWorkStatus: "",
+        workingType: "",
+        preferredAvailability: ""
+      };
+
+      try {
+        const respEmail = response.getRespondentEmail();
+        if (respEmail) student.email = respEmail.trim().toLowerCase();
+      } catch (emErr) {}
+
+      const itemResponses = response.getItemResponses();
+      itemResponses.forEach(function(itemResponse) {
+        const title = (itemResponse.getItem().getTitle() || "").trim();
+        const answer = itemResponse.getResponse();
+        mapFieldToStudent(student, title, answer);
+      });
+
+      if (!student.fullName) student.fullName = "Candidate";
+      if (student.email && student.email.includes("@")) {
+        const saveRes = saveStudent(student);
+        const generatedPassword = (saveRes && saveRes.password) ? saveRes.password : generatePassword(student.fullName, student.dob);
+        try {
+          sendWelcomeEmail(student.email, student.fullName, generatedPassword, student.mobile, student.skillCategory);
+        } catch (mErr) {}
+        synced++;
+        logs.push({ email: student.email, name: student.fullName, password: generatedPassword });
+      }
+    });
+  } catch (fErr) {
+    Logger.log("Error reading FormApp responses: " + fErr.message);
+  }
+
+  return {
+    success: true,
+    totalSynced: synced,
+    logs: logs
+  };
 }

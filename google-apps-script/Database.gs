@@ -1,11 +1,12 @@
 /**
  * ==========================================================
  * INFOGENX STUDENT ONBOARDING SYSTEM
- * DATABASE.GS - RESILIENT DATA ENGINE
+ * DATABASE.GS - RESILIENT MULTI-DATABASE DATA ENGINE
  * ==========================================================
  */
 
-// Student Database ID (https://docs.google.com/spreadsheets/d/1tEjn1hJ0rd2pNV3kaLyv4SitFyoRLwCKb5loAdEvjoM/edit)
+// Primary Student Database ID (https://docs.google.com/spreadsheets/d/1tEjn1hJ0rd2pNV3kaLyv4SitFyoRLwCKb5loAdEvjoM/edit?gid=1154490641#gid=1154490641)
+const PRIMARY_DATABASE_ID = "1tEjn1hJ0rd2pNV3kaLyv4SitFyoRLwCKb5loAdEvjoM";
 const BACKUP_DATABASE_ID = "1tEjn1hJ0rd2pNV3kaLyv4SitFyoRLwCKb5loAdEvjoM";
 
 /**
@@ -13,28 +14,43 @@ const BACKUP_DATABASE_ID = "1tEjn1hJ0rd2pNV3kaLyv4SitFyoRLwCKb5loAdEvjoM";
  */
 function getDatabaseId() {
   const id = PropertiesService.getScriptProperties().getProperty("DATABASE_ID");
-  return id || BACKUP_DATABASE_ID;
+  return id || PRIMARY_DATABASE_ID;
 }
 
 /**
- * Get Students Sheet (Auto-creates and sets headers if missing)
+ * Get Specific Students Sheet by ID (Auto-creates and sets headers if missing)
+ */
+function getStudentsSheetForDb(databaseId) {
+  if (!databaseId) return null;
+  try {
+    const spreadsheet = SpreadsheetApp.openById(databaseId);
+    let sheet = spreadsheet.getSheetByName("Students");
+
+    if (!sheet) {
+      sheet = spreadsheet.insertSheet("Students");
+      initializeStudentsHeaders(sheet);
+    } else if (sheet.getLastRow() === 0) {
+      initializeStudentsHeaders(sheet);
+    }
+    return sheet;
+  } catch (err) {
+    Logger.log("Notice opening database " + databaseId + ": " + err.message);
+    return null;
+  }
+}
+
+/**
+ * Get Default Students Sheet
  */
 function getStudentsSheet() {
   const databaseId = getDatabaseId();
-  if (!databaseId) {
-    throw new Error("DATABASE_ID not found. Please run setupProject() first.");
-  }
-
-  const spreadsheet = SpreadsheetApp.openById(databaseId);
-  let sheet = spreadsheet.getSheetByName("Students");
-
+  let sheet = getStudentsSheetForDb(databaseId);
   if (!sheet) {
-    sheet = spreadsheet.insertSheet("Students");
-    initializeStudentsHeaders(sheet);
-  } else if (sheet.getLastRow() === 0) {
-    initializeStudentsHeaders(sheet);
+    sheet = getStudentsSheetForDb(PRIMARY_DATABASE_ID) || getStudentsSheetForDb(BACKUP_DATABASE_ID);
   }
-
+  if (!sheet) {
+    throw new Error("Unable to open Students sheet in any configured database.");
+  }
   return sheet;
 }
 
@@ -112,9 +128,9 @@ function generatePasswordHash(password) {
 /**
  * Check if Email Exists and return row index
  */
-function findStudentRowByEmail(email) {
+function findStudentRowByEmailInSheet(sheet, email) {
+  if (!sheet) return -1;
   email = cleanText(email).toLowerCase();
-  const sheet = getStudentsSheet();
   const data = sheet.getDataRange().getValues();
 
   for (let i = 1; i < data.length; i++) {
@@ -126,6 +142,11 @@ function findStudentRowByEmail(email) {
   return -1;
 }
 
+function findStudentRowByEmail(email) {
+  const sheet = getStudentsSheet();
+  return findStudentRowByEmailInSheet(sheet, email);
+}
+
 /**
  * Get Student Profile by Email
  */
@@ -133,62 +154,64 @@ function getStudentByEmail(email) {
   if (!email) return null;
   email = cleanText(email).toLowerCase();
   
-  try {
-    const sheet = getStudentsSheet();
-    const data = sheet.getDataRange().getValues();
-    if (data.length <= 1) return null;
+  const dbs = [PRIMARY_DATABASE_ID, BACKUP_DATABASE_ID];
+  for (let d = 0; d < dbs.length; d++) {
+    try {
+      const sheet = getStudentsSheetForDb(dbs[d]);
+      if (!sheet) continue;
+      const data = sheet.getDataRange().getValues();
+      if (data.length <= 1) continue;
 
-    for (let i = 1; i < data.length; i++) {
-      const row = data[i];
-      const rowEmail = cleanText(row[3]).toLowerCase(); // Column D is Email
-      if (rowEmail === email) {
-        return {
-          row: i + 1,
-          registrationDate: row[0],
-          fullName: cleanText(row[1]),
-          dob: row[2],
-          email: cleanText(row[3]),
-          password: cleanText(row[4]),
-          passwordHash: cleanText(row[5]),
-          mobile: cleanText(row[6]),
-          city: cleanText(row[7]),
-          qualification: cleanText(row[8]),
-          college: cleanText(row[9]),
-          department: cleanText(row[10]),
-          yearOfPassing: cleanText(row[11]),
-          skillCategory: cleanText(row[12]),
-          skills: cleanText(row[13]),
-          status: cleanText(row[21]) || "Active"
-        };
+      for (let i = 1; i < data.length; i++) {
+        const row = data[i];
+        const rowEmail = cleanText(row[3]).toLowerCase(); // Column D is Email
+        if (rowEmail === email) {
+          return {
+            row: i + 1,
+            registrationDate: row[0],
+            fullName: cleanText(row[1]),
+            dob: row[2],
+            email: cleanText(row[3]),
+            password: cleanText(row[4]),
+            passwordHash: cleanText(row[5]),
+            mobile: cleanText(row[6]),
+            city: cleanText(row[7]),
+            qualification: cleanText(row[8]),
+            college: cleanText(row[9]),
+            department: cleanText(row[10]),
+            yearOfPassing: cleanText(row[11]),
+            skillCategory: cleanText(row[12]),
+            skills: cleanText(row[13]),
+            status: cleanText(row[21]) || "Active"
+          };
+        }
       }
+    } catch (err) {
+      Logger.log("getStudentByEmail error on db " + dbs[d] + ": " + err.message);
     }
-  } catch (err) {
-    Logger.log("getStudentByEmail error: " + err.message);
   }
   return null;
 }
 
 /**
- * Update Last Login timestamp
+ * Update Last Login timestamp across databases
  */
 function updateLastLogin(rowNumber) {
-  try {
-    if (rowNumber > 1) {
-      const sheet = getStudentsSheet();
-      // Column 24 is Last Login (Column X)
-      sheet.getRange(rowNumber, 24).setValue(new Date());
-    }
-  } catch (e) {
-    Logger.log("Error updating last login: " + e.message);
-  }
+  const dbs = [PRIMARY_DATABASE_ID, BACKUP_DATABASE_ID];
+  dbs.forEach(function(dbId) {
+    try {
+      const sheet = getStudentsSheetForDb(dbId);
+      if (sheet && rowNumber > 1) {
+        sheet.getRange(rowNumber, 24).setValue(new Date());
+      }
+    } catch (e) {}
+  });
 }
 
 /**
- * Save / Upsert Student
+ * Save / Upsert Student across all connected databases
  */
 function saveStudent(student) {
-  const sheet = getStudentsSheet();
-
   student.fullName = cleanText(student.fullName);
   student.email = cleanText(student.email).toLowerCase();
   student.mobile = cleanText(student.mobile);
@@ -199,8 +222,6 @@ function saveStudent(student) {
 
   const password = generatePassword(student.fullName, student.dob);
   const passwordHash = generatePasswordHash(password);
-
-  const existingRow = findStudentRowByEmail(student.email);
 
   const rowValues = [
     new Date(),
@@ -238,16 +259,35 @@ function saveStudent(student) {
     "", "", "", "", "Not Started"
   ];
 
-  if (existingRow > 0) {
-    Logger.log("Updating existing student profile at row: " + existingRow);
-    sheet.getRange(existingRow, 1, 1, rowValues.length).setValues([rowValues]);
-  } else {
-    sheet.appendRow(rowValues);
+  const targetDbs = [PRIMARY_DATABASE_ID, BACKUP_DATABASE_ID];
+  let savedCount = 0;
+
+  targetDbs.forEach(function(dbId) {
+    try {
+      const sheet = getStudentsSheetForDb(dbId);
+      if (sheet) {
+        const existingRow = findStudentRowByEmailInSheet(sheet, student.email);
+        if (existingRow > 0) {
+          Logger.log("Updating existing student profile in " + dbId + " at row: " + existingRow);
+          sheet.getRange(existingRow, 1, 1, rowValues.length).setValues([rowValues]);
+        } else {
+          sheet.appendRow(rowValues);
+          Logger.log("Appended new student profile to " + dbId);
+        }
+        savedCount++;
+      }
+    } catch (saveErr) {
+      Logger.log("Notice saving to DB " + dbId + ": " + saveErr.message);
+    }
+  });
+
+  if (savedCount === 0) {
+    throw new Error("Failed to record student profile in any connected spreadsheet.");
   }
 
   return {
     success: true,
     password: password,
-    message: "Student profile saved successfully."
+    message: "Student profile saved successfully across " + savedCount + " spreadsheets."
   };
 }

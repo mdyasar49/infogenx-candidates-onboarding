@@ -274,6 +274,29 @@
   z-index: 1;
 }
 
+.login-form-helper {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 13.5px;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.register-form-link {
+  color: #E65525 !important;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+.register-form-link:hover {
+  color: #00123C !important;
+  text-decoration: underline;
+  transform: translateX(2px);
+}
+
 @media (max-width: 540px) {
   .login-shell {
     padding: 24px 16px;

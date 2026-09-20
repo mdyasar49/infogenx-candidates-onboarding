@@ -453,7 +453,7 @@ router.delete('/users/:id', async (req, res) => {
 function getAuthTransporter() {
   const host = process.env.SMTP_HOST || 'smtp.gmail.com';
   const port = parseInt(process.env.SMTP_PORT || '587', 10);
-  const user = process.env.SMTP_USER || 'infogenx.dm@gmail.com';
+  const user = process.env.SMTP_USER || 'infogenx.jobs@gmail.com';
   const pass = process.env.SMTP_PASSWORD;
 
   return nodemailer.createTransport({
@@ -544,7 +544,7 @@ router.post('/onboard-candidate', async (req, res) => {
 
     const uniqueId = `${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
     await transporter.sendMail({
-      from: '"Infogenx HR Operations" <infogenx.dm@gmail.com>',
+      from: '"Infogenx HR Operations" <infogenx.jobs@gmail.com>',
       to: cleanEmail,
       subject: 'Infogenx HR Training Credentials - INFOGENX Candidate Onboarding & Assessment Portal',
       html: htmlContent,

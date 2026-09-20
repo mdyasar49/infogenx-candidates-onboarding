@@ -1,6 +1,8 @@
 import express from "express";
 import { questionBank } from "../services/questions.js";
 import { google } from "googleapis";
+import nodemailer from "nodemailer";
+import { generateHrAdminNotificationEmailHtml } from "../services/emailTemplates.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -8,6 +10,21 @@ const router = express.Router();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+function getAssessmentTransporter() {
+  const host = process.env.SMTP_HOST || 'smtp.gmail.com';
+  const port = parseInt(process.env.SMTP_PORT || '587', 10);
+  const user = process.env.SMTP_USER || 'infogenx.jobs@gmail.com';
+  const pass = process.env.SMTP_PASSWORD || 'xgcoycdiwqrpqcxa';
+
+  return nodemailer.createTransport({
+    host,
+    port,
+    secure: port === 465,
+    auth: { user, pass },
+    tls: { rejectUnauthorized: false }
+  });
+}
 
 // In-memory store for attempts and student status (serves as immediate fallback/cache)
 const studentAttempts = {};
@@ -165,11 +182,35 @@ router.post("/submit", async (req, res) => {
       console.warn("Google Sheets logging notice:", err.message);
     }
 
-    // Send PASS email notification if passed
+    // Send assessment completion email notification to nithyanand.a@infogenx.com.au
     let emailSent = false;
-    if (passed) {
-      console.log(`[PASS EMAIL TRIGGERED] Candidate ${candidateDetails?.name || cleanEmail} passed assessment with ${score}/50 (${percentage}%). Task Access: ENABLED.`);
+    try {
+      const transporter = getAssessmentTransporter();
+      const adminEmail = process.env.DIRECTOR_EMAIL || "nithyanand.a@infogenx.com.au";
+      const candidateInfo = {
+        name: candidateDetails?.name || candidateDetails?.fullName || cleanEmail.split('@')[0],
+        email: cleanEmail,
+        phone: candidateDetails?.mobile || candidateDetails?.phone || "N/A",
+        location: candidateDetails?.city || candidateDetails?.location || "Chennai, Tamil Nadu",
+        qualification: candidateDetails?.qualification || "Graduate",
+        score: score,
+        percentage: percentage,
+        status: resultStatus,
+        attemptNumber: attemptNumber
+      };
+
+      const htmlBody = generateHrAdminNotificationEmailHtml(candidateInfo);
+
+      await transporter.sendMail({
+        from: '"Infogenx HR Operations" <infogenx.jobs@gmail.com>',
+        to: [adminEmail, "admin@infogenx.com"],
+        subject: `Candidate Assessment Completed: ${candidateInfo.name} (${resultStatus} - ${score}/50)`,
+        html: htmlBody
+      });
       emailSent = true;
+      console.log(`[ASSESSMENT NOTIFICATION SENT] Notification dispatched to ${adminEmail} for candidate ${candidateInfo.name}`);
+    } catch (mailErr) {
+      console.warn("[ASSESSMENT NOTIFICATION ERROR]", mailErr.message);
     }
 
     return res.json({
