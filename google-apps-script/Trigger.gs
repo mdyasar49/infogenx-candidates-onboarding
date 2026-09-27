@@ -12,9 +12,9 @@
  * ==========================================================
  */
 
-// Google Form: https://docs.google.com/forms/d/e/1FAIpQLSdAffcQaR1oRuv_NwT5D-MrnGbjPq0EE_cka6jAZ5FjEgt0WA/viewform
+// Google Form: https://docs.google.com/forms/d/e/1FAIpQLSeIUXwZhN5mw5TZwRZ5gHFMAa8FdvnaAI87kEB4mplbjaHFlQ/viewform
 const TARGET_FORM_ID = "1ugPH89EBC1RSVJrrHKs3qnYnyR3y5rXAVwK43wamthE";
-const TARGET_DATABASE_ID = "1tEjn1hJ0rd2pNV3kaLyv4SitFyoRLwCKb5loAdEvjoM";
+const TARGET_DATABASE_ID = "1gMo3xbxpmqQQ9SJ1OjISQ1ktoaylNhsDiOrVmH6_31M";
 const PRIMARY_PROJECT_ID = "1KCvVM5_9iTYM484tL7Y2TeZq4QFR6EeA7xMpSwLnMolNTXQk3L_PBPww";
 
 function isPrimaryProject() {
@@ -107,6 +107,12 @@ function onStudentRegistration(e) {
     // -------------------------------------------------------
     if (e.response && typeof e.response.getItemResponses === "function") {
       Logger.log("[Source: Google Form Submission]");
+      try {
+        if (e.source && typeof e.source.getTitle === "function") {
+          student.sourceForm = e.source.getTitle();
+        }
+      } catch(srcErr) {}
+      if (!student.sourceForm) student.sourceForm = "Google Form Submit";
       
       // Extract respondent email from form settings
       try {
@@ -133,6 +139,13 @@ function onStudentRegistration(e) {
     // -------------------------------------------------------
     else if (e.namedValues) {
       Logger.log("[Source: Google Sheet Form Submit (namedValues)]");
+      try {
+        if (e.range) {
+          student.sourceForm = e.range.getSheet().getName();
+        }
+      } catch(rErr) {}
+      if (!student.sourceForm) student.sourceForm = "Spreadsheet Form Submit";
+
       for (const title in e.namedValues) {
         const val = e.namedValues[title];
         const answer = Array.isArray(val) ? val.join(", ") : val;
@@ -397,10 +410,23 @@ function createAllTriggers() {
       .timeBased()
       .everyMinutes(5)
       .create();
-    Logger.log("✅ [2/2] 5-Minute Auto-Sync Fallback Trigger Connected!");
+    Logger.log("✅ [2/3] 5-Minute Auto-Sync Fallback Trigger Connected!");
     createdCount++;
   } catch (tErr) {
     Logger.log("⚠️ Time Trigger Notice: " + tErr.message);
+  }
+
+  // 4. Create Universal Spreadsheet onFormSubmit Trigger (Catches ANY newly linked form!)
+  try {
+    const ss = SpreadsheetApp.openById(databaseId);
+    ScriptApp.newTrigger("onStudentRegistration")
+      .forSpreadsheet(ss)
+      .onFormSubmit()
+      .create();
+    Logger.log("✅ [3/3] Universal Spreadsheet onFormSubmit Trigger Connected for: " + databaseId);
+    createdCount++;
+  } catch (ssTrigErr) {
+    Logger.log("⚠️ Spreadsheet Trigger Notice: " + ssTrigErr.message);
   }
 
   Logger.log("🎉 Triggers Setup Complete (" + createdCount + " active triggers)!");
@@ -408,49 +434,44 @@ function createAllTriggers() {
 }
 
 /**
- * Polling Engine: Automatically checks for any unprocessed rows in Google Sheet Form Responses
- * Runs every 1 minute to guarantee 100% delivery even if form event triggers delay!
+ * Polling Engine: Automatically checks for any unprocessed rows across ALL Form Response tabs in Google Sheet
+ * Ensures ANY new form linked by HR automatically gets processed and tagged with its source form name!
  */
 function syncSheetResponses() {
   const databaseId = TARGET_DATABASE_ID;
   try {
     const ss = SpreadsheetApp.openById(databaseId);
     const sheets = ss.getSheets();
-    
-    // Find the responses sheet
-    let responseSheet = null;
-    for (let i = 0; i < sheets.length; i++) {
-      const sName = sheets[i].getName();
-      if (sName.toLowerCase().includes("response") || sName.toLowerCase().includes("form")) {
-        responseSheet = sheets[i];
-        break;
+    let totalProcessed = 0;
+
+    for (let sIdx = 0; sIdx < sheets.length; sIdx++) {
+      const responseSheet = sheets[sIdx];
+      const sName = responseSheet.getName();
+
+      // Skip Students tabs, Config tab
+      if (sName.startsWith("Students") || sName.toLowerCase().includes("config")) continue;
+      if (!sName.toLowerCase().includes("response") && !sName.toLowerCase().includes("form") && !sName.toLowerCase().includes("sheet1")) continue;
+
+      const data = responseSheet.getDataRange().getValues();
+      if (data.length < 2) continue;
+
+      const headers = data[0].map(function(h) { return String(h).trim().toLowerCase(); });
+      
+      // Check if Status column exists, else append it
+      let statusColIdx = headers.indexOf("onboarding status");
+      if (statusColIdx === -1) {
+        statusColIdx = headers.length;
+        responseSheet.getRange(1, statusColIdx + 1).setValue("Onboarding Status").setFontWeight("bold");
       }
-    }
-    if (!responseSheet && sheets.length > 0) {
-      responseSheet = sheets[0];
-    }
-    if (!responseSheet) return { success: true, processed: 0 };
 
-    const data = responseSheet.getDataRange().getValues();
-    if (data.length < 2) return { success: true, processed: 0 };
+      let passColIdx = headers.indexOf("generated password");
+      if (passColIdx === -1) {
+        passColIdx = statusColIdx + 1;
+        responseSheet.getRange(1, passColIdx + 1).setValue("Generated Password").setFontWeight("bold");
+      }
 
-    const headers = data[0].map(function(h) { return String(h).trim().toLowerCase(); });
-    
-    // Check if Status column exists, else append it
-    let statusColIdx = headers.indexOf("onboarding status");
-    if (statusColIdx === -1) {
-      statusColIdx = headers.length;
-      responseSheet.getRange(1, statusColIdx + 1).setValue("Onboarding Status").setFontWeight("bold");
-    }
-
-    let passColIdx = headers.indexOf("generated password");
-    if (passColIdx === -1) {
-      passColIdx = statusColIdx + 1;
-      responseSheet.getRange(1, passColIdx + 1).setValue("Generated Password").setFontWeight("bold");
-    }
-
-    const startRow = Math.max(1, data.length - 15);
-    for (let r = startRow; r < data.length; r++) {
+      const startRow = Math.max(1, data.length - 20);
+      for (let r = startRow; r < data.length; r++) {
         const row = data[r];
         const currentStatus = String(row[statusColIdx] || "").trim().toUpperCase();
         if (currentStatus === "PROCESSED") continue;
@@ -481,7 +502,8 @@ function syncSheetResponses() {
           currentTakeHomeSalaryHourlyRate: "",
           currentWorkStatus: "",
           workingType: "",
-          preferredAvailability: ""
+          preferredAvailability: "",
+          sourceForm: sName
         };
 
         for (let c = 0; c < headers.length; c++) {
@@ -495,9 +517,9 @@ function syncSheetResponses() {
         }
         if (!student.fullName) student.fullName = "Candidate";
 
-        Logger.log("Auto-syncing candidate: " + student.fullName + " <" + student.email + ">");
+        Logger.log("Auto-syncing candidate: " + student.fullName + " <" + student.email + "> from form tab: " + sName);
 
-        // 1. Save to main database sheet
+        // 1. Save to active database sheet
         let generatedPassword = "";
         try {
           const saveRes = saveStudent(student);
@@ -514,14 +536,16 @@ function syncSheetResponses() {
         // 3. Mark processed in responses sheet
         responseSheet.getRange(r + 1, statusColIdx + 1).setValue("PROCESSED");
         responseSheet.getRange(r + 1, passColIdx + 1).setValue(generatedPassword);
-        Logger.log("✅ Candidate " + student.email + " onboarded with password: " + generatedPassword);
+        Logger.log("✅ Candidate " + student.email + " onboarded with password: " + generatedPassword + " (Source: " + sName + ")");
+        totalProcessed++;
       }
-      return { success: true };
-    } catch (err) {
-      Logger.log("Error in syncSheetResponses: " + err.message);
-      return { success: false, error: err.message };
     }
+    return { success: true, processed: totalProcessed };
+  } catch (err) {
+    Logger.log("Error in syncSheetResponses: " + err.message);
+    return { success: false, error: err.message };
   }
+}
 
 /**
  * Test function that executes a full simulated registration

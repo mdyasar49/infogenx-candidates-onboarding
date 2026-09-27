@@ -5,14 +5,29 @@ import { login as authLogin } from '../../services/authService'
 import logo from '../../assets/logo.png'
 import './LoginPage.css'
 
+const DEFAULT_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeIUXwZhN5mw5TZwRZ5gHFMAa8FdvnaAI87kEB4mplbjaHFlQ/viewform?usp=sharing&ouid=101109227624004877778";
+const APPS_SCRIPT_API = "https://script.google.com/macros/s/AKfycbz3WgvD0B2kWArTR5oKb6yidhCodDfFA6Cfs-6dVt4jU4bDvkWGN6Tss4CTyLU7pby-/exec?action=getActiveForm";
+
 function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [formUrl, setFormUrl] = useState(DEFAULT_FORM_URL)
   const navigate = useNavigate()
   const { login } = useAuth()
   const canvasRef = useRef(null)
+
+  useEffect(() => {
+    fetch(APPS_SCRIPT_API)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.formUrl) {
+          setFormUrl(data.formUrl)
+        }
+      })
+      .catch(() => {})
+  }, [])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -177,7 +192,7 @@ function LoginPage() {
               <p>
                 Haven't applied yet?{' '}
                 <a
-                  href="https://docs.google.com/forms/d/e/1FAIpQLSdAffcQaR1oRuv_NwT5D-MrnGbjPq0EE_cka6jAZ5FjEgt0WA/viewform?usp=sharing&ouid=101109227624004877778"
+                  href={formUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="register-form-link"

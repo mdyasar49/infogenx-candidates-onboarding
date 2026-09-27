@@ -12,7 +12,7 @@ from email_templates import get_welcome_email_html, WELCOME_EMAIL_SUBJECT
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
 
-SPREADSHEET_ID = "1tEjn1hJ0rd2pNV3kaLyv4SitFyoRLwCKb5loAdEvjoM"
+SPREADSHEET_ID = "1gMo3xbxpmqQQ9SJ1OjISQ1ktoaylNhsDiOrVmH6_31M"
 CLASPRC_PATH = Path(os.path.expanduser("~/.clasprc.json"))
 
 PORTAL_URL = "https://candidates.infogenx.com/login"

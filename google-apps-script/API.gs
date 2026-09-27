@@ -17,12 +17,67 @@ function doGet(e) {
       });
     }
 
+    if (action === "getActiveForm" || action === "getFormUrl") {
+      try {
+        const ss = SpreadsheetApp.openById(PRIMARY_DATABASE_ID);
+        const configSheet = ss.getSheetByName("Config");
+        let formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSeIUXwZhN5mw5TZwRZ5gHFMAa8FdvnaAI87kEB4mplbjaHFlQ/viewform?usp=sharing&ouid=101109227624004877778";
+        if (configSheet) {
+          const data = configSheet.getDataRange().getValues();
+          for (let i = 1; i < data.length; i++) {
+            if (String(data[i][0]).trim().toUpperCase() === "ACTIVE_FORM_URL") {
+              formUrl = String(data[i][1]).trim() || formUrl;
+              break;
+            }
+          }
+        }
+        return jsonResponse({ success: true, formUrl: formUrl });
+      } catch (err) {
+        return jsonResponse({
+          success: true,
+          formUrl: "https://docs.google.com/forms/d/e/1FAIpQLSeIUXwZhN5mw5TZwRZ5gHFMAa8FdvnaAI87kEB4mplbjaHFlQ/viewform?usp=sharing&ouid=101109227624004877778"
+        });
+      }
+    }
+
     if (action === "sync" || action === "syncSheet") {
       return jsonResponse({
         success: true,
         result: syncSheetResponses(),
         formSync: syncFormResponsesDirect()
       });
+    }
+
+    if (action === "inspectData") {
+      const candidatesSheetIds = [
+        "1cHbOnKddysB-8PVvtDRT2vg2R2Mrf-tDirL7DF0n2Sg",
+        "1Y8Xdj3jNvh34zTK0OPfhH-7SzxE2frWQ0KJfnErrqXE",
+        "116q9erfGJz4vXgX_uUxJu2W8mVTrry_g3Rp8FrpC74w",
+        "1E9Op-03u7cn3sQiz7M2sGB0XNAuFGcpvpn0ypbcnMMQ",
+        "1meidzpD13bG0uyAP-PTlsjWdf5j__YOI6gcCm-v63LM",
+        "1tEjn1hJ0rd2pNV3kaLyv4SitFyoRLwCKb5loAdEvjoM"
+      ];
+      const results = {};
+      candidatesSheetIds.forEach(id => {
+        try {
+          const ss = SpreadsheetApp.openById(id);
+          const sheets = ss.getSheets().map(s => {
+            return {
+              name: s.getName(),
+              rows: s.getLastRow(),
+              cols: s.getLastColumn()
+            };
+          });
+          results[id] = { title: ss.getName(), sheets: sheets };
+        } catch (e) {
+          results[id] = { error: e.message };
+        }
+      });
+      return jsonResponse({ success: true, results: results });
+    }
+
+    if (action === "migrateToPermanentSheet") {
+      return jsonResponse(executeMigrationToPermanentSheet());
     }
 
     if (action === "setupTriggers" || action === "createTriggers") {

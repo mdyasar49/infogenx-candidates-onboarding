@@ -1,9 +1,24 @@
+import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import logo from '../../assets/logo.png'
 import './RegistrationPage.css'
 
+const DEFAULT_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSeIUXwZhN5mw5TZwRZ5gHFMAa8FdvnaAI87kEB4mplbjaHFlQ/viewform?usp=sharing&ouid=101109227624004877778";
+const APPS_SCRIPT_API = "https://script.google.com/macros/s/AKfycbz3WgvD0B2kWArTR5oKb6yidhCodDfFA6Cfs-6dVt4jU4bDvkWGN6Tss4CTyLU7pby-/exec?action=getActiveForm";
+
 function RegistrationPage() {
-  const formUrl = "https://docs.google.com/forms/d/e/1FAIpQLSdAffcQaR1oRuv_NwT5D-MrnGbjPq0EE_cka6jAZ5FjEgt0WA/viewform?usp=sharing&ouid=101109227624004877778";
+  const [formUrl, setFormUrl] = useState(DEFAULT_FORM_URL);
+
+  useEffect(() => {
+    fetch(APPS_SCRIPT_API)
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.formUrl) {
+          setFormUrl(data.formUrl);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   return (
     <section className="register-shell">
