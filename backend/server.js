@@ -5,6 +5,7 @@ import candidateAuthRouter from "./routes/candidate-auth.js";
 import assessmentRouter from "./routes/assessment.js";
 import taskRouter from "./routes/task.js";
 import offerLetterRouter from "./routes/offerLetter.js";
+import applyRouter from "./routes/apply.js";
 
 
 
@@ -46,6 +47,7 @@ app.use("/api/candidate-auth", candidateAuthRouter);
 app.use("/api/assessment", assessmentRouter);
 app.use("/api/task", taskRouter);
 app.use("/api/offer-letter", offerLetterRouter);
+app.use("/api/apply", applyRouter);
 
 const PORT = process.env.PORT || 5000;
 

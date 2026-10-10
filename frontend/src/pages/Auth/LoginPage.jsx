@@ -192,9 +192,7 @@ function LoginPage() {
               <p>
                 Haven't applied yet?{' '}
                 <a
-                  href={formUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="/apply.html"
                   className="register-form-link"
                 >
                   Fill Candidate Application Form →

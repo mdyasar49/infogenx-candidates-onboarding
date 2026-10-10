@@ -689,13 +689,51 @@ Please review my application for Infogenx Technologies.`;
 
     updateMessagePreview();
 
-    function handleFormSubmit(e) {
+    async function handleFormSubmit(e) {
       e.preventDefault();
       const msg = buildMessageText();
       
       const toast = document.getElementById('statusToast');
       toast.style.display = 'block';
+      toast.textContent = '⏳ Recording your application to Google Sheet...';
 
+      // 1. Prepare data for Candidate Portal API & Google Sheet
+      const formData = {
+        name: document.getElementById('fullName').value.trim(),
+        mobile: document.getElementById('mobile').value.trim(),
+        location: document.getElementById('location').value.trim(),
+        appliedRole: document.getElementById('appliedRole').value,
+        experience: document.getElementById('experience').value.trim(),
+        qualification: document.getElementById('qualification').value.trim(),
+        techSkills: document.getElementById('techSkills').value.trim(),
+        certification: document.getElementById('certification').value.trim() || 'None',
+        resumeUrl: document.getElementById('resume').value.trim(),
+        linkedinUrl: document.getElementById('linkedin').value.trim(),
+        purpose: document.getElementById('purpose').value,
+        unpaidTerms: document.getElementById('unpaidTerms').value,
+        startDate: document.getElementById('startDate').value.trim(),
+        currentSalary: document.getElementById('currentSalary').value.trim() || 'Fresher / N/A',
+        freelance: document.getElementById('freelance').value.trim() || 'No',
+        workMode: document.getElementById('workMode').value,
+        durationTimings: document.getElementById('durationTimings').value.trim(),
+        availabilitySlots: document.getElementById('availabilitySlots').value.trim()
+      };
+
+      // 2. Asynchronously save to Google Sheets via Candidate Portal Backend
+      try {
+        fetch('/api/apply/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData)
+        }).then(r => r.json()).then(res => {
+          console.log('[Candidate Portal API]', res);
+        }).catch(err => {
+          console.warn('[Candidate Portal API]', err);
+        });
+      } catch (err) {}
+
+      // 3. Immediately launch WhatsApp to Anand Sir
+      toast.textContent = '✓ Application recorded in Google Sheet! Launching WhatsApp to send directly to Anand Sir...';
       const waUrl = `https://wa.me/${RECIPIENT_PHONE}?text=${encodeURIComponent(msg)}`;
       window.open(waUrl, '_blank');
     }

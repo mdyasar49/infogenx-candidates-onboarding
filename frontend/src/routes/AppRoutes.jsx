@@ -21,6 +21,11 @@ import AdminOfferReviewPage from '../pages/Admin/AdminOfferReviewPage'
 import ProtectedRoute from '../components/ProtectedRoute'
 import VisualTheme from '../components/VisualTheme'
 
+function ApplyRedirect() {
+  window.location.replace('/apply.html')
+  return null
+}
+
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -28,6 +33,8 @@ function AppRoutes() {
       <Routes>
         <Route path="/" element={<Navigate to="/pdf" replace />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/apply" element={<ApplyRedirect />} />
+        <Route path="/register" element={<ApplyRedirect />} />
 
         {/* 6-Stage Core Learning & Assessment Flow */}
         <Route path="/pdf" element={<ProtectedRoute><PdfLearningPage /></ProtectedRoute>} />
