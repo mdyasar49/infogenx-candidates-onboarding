@@ -40,6 +40,22 @@ function doGet(e) {
       }
     }
 
+    if (action === "updateConfirmation" || action === "setConfirmation") {
+      const formId = "1ugPH89EBC1RSVJrrHKs3qnYnyR3y5rXAVwK43wamthE";
+      const form = FormApp.openById(formId);
+      form.setConfirmationMessage(
+        "✅ Your Infogenx Application has been recorded!\n\n" +
+        "⚠️ FINAL MANDATORY STEP:\n" +
+        "Please click the link below to send your application details directly to our Hiring Manager (Anand Sir) on WhatsApp to confirm your interview slot:\n\n" +
+        "👉 WhatsApp Link: https://wa.me/919787806366?text=Hi%20Anand%20Sir%2C%20I%20have%20submitted%20the%20Infogenx%20Application%20Form.%20Please%20find%20my%20details%20and%20resume.\n\n" +
+        "Direct Contact: +91 9787806366"
+      );
+      return jsonResponse({
+        success: true,
+        message: "Google Form confirmation message updated successfully with Anand Sir WhatsApp link!"
+      });
+    }
+
     if (action === "sync" || action === "syncSheet") {
       return jsonResponse({
         success: true,

@@ -241,12 +241,12 @@ function onStudentRegistration(e) {
     }
 
     // -------------------------------------------------------
-    // 4. Dispatch HR SMS Notification
+    // 4. Dispatch Candidate WhatsApp Action Email (Pre-filled Data to Anand Sir)
     // -------------------------------------------------------
     try {
-      sendHRSMS(student);
-    } catch (hrErr) {
-      Logger.log("⚠️ HR SMS dispatch warning: " + hrErr.message);
+      sendCandidateWhatsAppActionEmail(student);
+    } catch (waErr) {
+      Logger.log("⚠️ Candidate WhatsApp email notice: " + waErr.message);
     }
 
     Logger.log("🎉 Complete Candidate Onboarding Workflow Finished for: " + student.fullName);
@@ -668,4 +668,62 @@ function syncFormResponsesDirect() {
     totalSynced: synced,
     logs: logs
   };
+}
+
+/**
+ * Sends Candidate an Immediate 1-Click WhatsApp Trigger Email with Pre-filled Form Data
+ */
+function sendCandidateWhatsAppActionEmail(student) {
+  try {
+    if (!student.email || !student.email.includes("@")) return;
+
+    const name = student.fullName || "Candidate";
+    const mobile = student.mobile || "N/A";
+    const city = student.city || "Tamil Nadu";
+    const qualification = student.qualification || "N/A";
+    const skills = student.skills || "N/A";
+    const exp = student.experienceType || "Fresher";
+    const resume = student.resumeLink || "N/A";
+
+    const waMsg = `Hi Anand Sir, I have submitted the Infogenx Application Form with my details:
+• Name: ${name}
+• Mobile: ${mobile}
+• Email: ${student.email}
+• City: ${city}
+• Qualification: ${qualification}
+• Skills: ${skills}
+• Experience: ${exp}
+• Resume Link: ${resume}
+
+Please review my application.`;
+
+    const waLink = "https://wa.me/919787806366?text=" + encodeURIComponent(waMsg);
+
+    const subject = "Final Step: Confirm Your Application with Anand Sir on WhatsApp";
+    const body = `Dear ${name},
+
+Thank you for submitting your application at Infogenx!
+
+To ensure your application is reviewed immediately by our Hiring Manager (Anand Sir), please click the link below to send your pre-filled details directly from your WhatsApp:
+
+👉 SEND DETAILS ON WHATSAPP:
+${waLink}
+
+When you click the link above, your WhatsApp will open with all your entered details pre-typed. Simply tap 'Send' to deliver your application directly to Anand Sir (+91 9787806366).
+
+Best regards,
+Talent Acquisition Operations
+Infogenx
+Email: infogenx.jobs@gmail.com
+Hiring Manager WhatsApp: +91 9787806366`;
+
+    MailApp.sendEmail({
+      to: student.email,
+      subject: subject,
+      body: body
+    });
+    Logger.log("✅ Candidate WhatsApp Action Email sent to: " + student.email);
+  } catch (err) {
+    Logger.log("⚠️ Candidate WhatsApp Action Email error: " + err.message);
+  }
 }

@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Infogenx Technologies - Candidate & Internship Application Portal</title>
+  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --navy-primary: #00123C;
+      --orange-blood: #E65525;
+      --white-bg: #FFFFFF;
+      --peach-subtle: #FFF8F3;
+      --text-dark: #00123C;
+      --text-muted: #475569;
+      --border-light: #CBD5E1;
+      --radius-card: 22px;
+      --radius-input: 12px;
+      --font-main: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --wa-green: #25D366;
+      --wa-green-hover: #1eb855;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--white-bg);
+      color: var(--text-dark);
+      font-family: var(--font-main);
+      min-height: 100vh;
+      position: relative;
+      overflow-x: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 16px 80px;
+    }
+
+    /* Interactive Background Canvas identical to Candidate Portal */
+    .network-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .page-wrapper {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 680px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Card styling exactly matching candidate portal */
+    .portal-card {
+      width: 100%;
+      background: var(--white-bg);
+      padding: 44px 38px;
+      border-radius: var(--radius-card);
+      border: 1.5px solid transparent;
+      background-clip: padding-box, border-box;
+      background-origin: padding-box, border-box;
+      background-image: linear-gradient(#ffffff, #ffffff), linear-gradient(135deg, var(--navy-primary) 0%, var(--orange-blood) 100%);
+      box-shadow: 0 20px 50px rgba(0, 18, 60, 0.08), 0 4px 16px rgba(0, 18, 60, 0.03);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .portal-card:hover {
+      box-shadow: 0 24px 60px rgba(0, 18, 60, 0.12), 0 6px 20px rgba(230, 85, 37, 0.08);
+    }
+
+    /* Logo & Header */
+    .hero-logo-wrap {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .hero-logo {
+      width: 220px;
+      height: auto;
+      max-height: 70px;
+      object-fit: contain;
+      margin: 0 auto;
+      display: block;
+      filter: drop-shadow(0 2px 8px rgba(0, 18, 60, 0.06));
+    }
+
+    .welcome-header {
+      text-align: center;
+      margin-bottom: 26px;
+    }
+
+    .welcome-header h1 {
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    .text-navy {
+      color: var(--navy-primary);
+    }
+
+    .text-orange {
+      color: var(--orange-blood);
+    }
+
+    .welcome-header p {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 520px;
+      margin: 0 auto;
+    }
+
+    .badge-bar {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 12px;
+      flex-wrap: wrap;
+    }
+
+    .badge-pill {
+      font-size: 11.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 4px 12px;
+      border-radius: 999px;
+    }
+
+    .badge-fresher {
+      background: #ecfdf5;
+      color: #059669;
+      border: 1px solid #a7f3d0;
+    }
+
+    .badge-roles {
+      background: #eff6ff;
+      color: #2563eb;
+      border: 1px solid #bfdbfe;
+    }
+
+    /* Recipient Notification Box */
+    .recipient-info-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: var(--peach-subtle);
+      border: 1px solid rgba(230, 85, 37, 0.25);
+      border-radius: 12px;
+      padding: 12px 16px;
+      margin-bottom: 26px;
+      color: var(--navy-primary);
+      font-size: 13px;
+    }
+
+    .recipient-info-box svg {
+      width: 22px;
+      height: 22px;
+      fill: var(--orange-blood);
+      flex-shrink: 0;
+    }
+
+    /* Form Section Dividers */
+    .section-divider {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--orange-blood);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      margin: 24px 0 14px;
+      padding-bottom: 6px;
+      border-bottom: 1.5px solid #f1f5f9;
+    }
+
+    /* Form Fields */
+    .form-group {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--navy-primary);
+      margin-bottom: 6px;
+    }
+
+    .form-group label span.req {
+      color: var(--orange-blood);
+    }
+
+    .form-group label span.opt {
+      color: #94a3b8;
+      font-weight: normal;
+      font-size: 11.5px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    @media (max-width: 560px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+      .portal-card {
+        padding: 32px 20px;
+      }
+      .welcome-header h1 {
+        font-size: 24px;
+      }
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: var(--radius-input);
+      color: var(--navy-primary);
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.2s ease;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--orange-blood);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(230, 85, 37, 0.12);
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    .field-hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    /* Live Preview */
+    .preview-box {
+      margin-top: 24px;
+      background: #f8fafc;
+      border: 1.5px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 16px;
+    }
+
+    .preview-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--navy-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .preview-text {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 12px;
+      color: #334155;
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 14px;
+      white-space: pre-wrap;
+      line-height: 1.55;
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    /* Action Buttons */
+    .btn-submit {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: var(--wa-green);
+      color: #ffffff;
+      border: none;
+      border-radius: 14px;
+      padding: 16px 24px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 26px;
+      transition: all 0.25s ease;
+      box-shadow: 0 10px 24px rgba(37, 211, 102, 0.28);
+    }
+
+    .btn-submit:hover {
+      background: var(--wa-green-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(37, 211, 102, 0.38);
+    }
+
+    .btn-submit svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+      flex-shrink: 0;
+    }
+
+    .status-toast {
+      display: none;
+      background: #ecfdf5;
+      border: 1px solid #10b981;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 16px;
+      font-size: 13px;
+      color: #065f46;
+      text-align: center;
+      font-weight: 600;
+    }
+
+    .portal-footer {
+      margin-top: 28px;
+      text-align: center;
+      font-size: 12.5px;
+      color: var(--text-muted);
+    }
+
+    .portal-footer a {
+      color: var(--navy-primary);
+      text-decoration: none;
+      font-weight: 700;
+    }
+
+    .portal-footer a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Floating Network Background Canvas -->
+  <canvas id="networkCanvas" class="network-canvas"></canvas>
+
+  <div class="page-wrapper">
+    <div class="portal-card">
+
+      <!-- Logo Header -->
+      <div class="hero-logo-wrap">
+        <img src="/logo.png" alt="Infogenx Technologies" class="hero-logo" onerror="this.src='https://candidates.infogenx.com/logo.png'">
+      </div>
+
+      <div class="welcome-header">
+        <h1>
+          <span class="text-navy">Candidate & Internship</span> 
+          <span class="text-orange">Application</span>
+        </h1>
+        <p>Complete your application questionnaire below. Submitting will format your answers and directly launch WhatsApp to connect with Anand Sir.</p>
+        <div class="badge-bar">
+          <span class="badge-pill badge-fresher">✓ Freshers & Experienced Welcome</span>
+          <span class="badge-pill badge-roles">✓ HR, Digital Marketing, Odoo, Zoho & Tech</span>
+        </div>
+      </div>
+
+      <!-- Recipient Banner -->
+      <div class="recipient-info-box">
+        <svg viewBox="0 0 24 24">
+          <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c4.54 0 8.24 3.7 8.24 8.24 0 2.2-.86 4.28-2.42 5.84-1.56 1.56-3.64 2.42-5.84 2.42-1.42 0-2.82-.37-4.05-1.09l-.29-.17-3.11.82.83-3.03-.19-.31c-.81-1.3-1.24-2.8-1.24-4.35 0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.24-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.34-.76-1.84-.2-.49-.4-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.28z"/>
+        </svg>
+        <div>
+          <strong>Direct Recruiter WhatsApp:</strong> Submissions are delivered straight to <strong>Anand Sir</strong> at <strong>+91 9787806366</strong>.
+        </div>
+      </div>
+
+      <form id="candidateApplicationForm" onsubmit="handleFormSubmit(event)">
+
+        <!-- 1. PERSONAL & CONTACT DETAILS -->
+        <div class="section-divider">1. Personal & Contact Details</div>
+
+        <div class="form-group">
+          <label for="fullName">Name <span class="req">*</span></label>
+          <input type="text" id="fullName" placeholder="e.g. Arun Kumar" required>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="mobile">Contact No <span class="req">*</span></label>
+            <input type="tel" id="mobile" placeholder="e.g. 9876543210" pattern="[0-9]{10}" title="Enter valid 10-digit mobile number" required>
+          </div>
+          <div class="form-group">
+            <label for="location">Location <span class="req">*</span></label>
+            <input type="text" id="location" placeholder="e.g. Chennai, Tamil Nadu" required>
+          </div>
+        </div>
+
+        <!-- 2. QUALIFICATION & EXPERIENCE -->
+        <div class="section-divider">2. Role, Qualification & Experience</div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="appliedRole">Applying For (Role) <span class="req">*</span></label>
+            <select id="appliedRole" required>
+              <option value="HR Intern / HR Trainee">HR Intern / HR Trainee</option>
+              <option value="Digital Marketing Specialist / Intern">Digital Marketing Specialist / Intern</option>
+              <option value="Odoo ERP Developer / Intern">Odoo ERP Developer / Intern</option>
+              <option value="Zoho Developer / Intern">Zoho Developer / Intern</option>
+              <option value="Full Stack Developer / Intern">Full Stack Developer / Intern</option>
+              <option value="Business Development / Sales">Business Development / Sales</option>
+              <option value="Other / General Application">Other / General Application</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="experience">Experience if any <span class="req">*</span></label>
+            <input type="text" id="experience" placeholder="e.g. Fresher / 6 months experience" required>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="qualification">Qualification <span class="req">*</span></label>
+            <input type="text" id="qualification" placeholder="e.g. MBA / BBA / B.E / B.Tech / B.Com (2024)" required>
+          </div>
+          <div class="form-group">
+            <label for="techSkills">Tech Skills <span class="req">*</span></label>
+            <input type="text" id="techSkills" placeholder="e.g. MS Excel, Recruitment, SEO, Python, Tools" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="certification">Certification if any <span class="opt">(Optional)</span></label>
+          <input type="text" id="certification" placeholder="e.g. HR Certification, Digital Marketing, None">
+        </div>
+
+        <div class="form-group">
+          <label for="resume">Google Drive Resume URL (Link) <span class="req">*</span></label>
+          <input type="url" id="resume" placeholder="https://drive.google.com/file/d/..." required>
+          <div class="field-hint">Ensure sharing access is set to 'Anyone with the link can view'.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="linkedin">LinkedIn profile URL <span class="req">*</span></label>
+          <input type="url" id="linkedin" placeholder="https://www.linkedin.com/in/yourprofile" required>
+        </div>
+
+        <!-- 3. INTERNSHIP PURPOSE & TERMS -->
+        <div class="section-divider">3. Purpose & Terms</div>
+
+        <div class="form-group">
+          <label for="purpose">Propose of this Internship if you are choosing this option <span class="req">*</span></label>
+          <select id="purpose" required>
+            <option value="Just to Learn and gain experience">Just to Learn and gain experience</option>
+            <option value="Learn and Earn">Learn and Earn</option>
+            <option value="Only to Earn">Only to Earn</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="unpaidTerms">Unpaid Internship is ok for you?, if so how many months is ok? <span class="req">*</span></label>
+          <select id="unpaidTerms" required>
+            <option value="Yes, 1 Month is OK (Then review for Paid Project)">Yes, 1 Month is OK (Then review for Paid Project)</option>
+            <option value="Yes, 2 Months is OK">Yes, 2 Months is OK</option>
+            <option value="Yes, 3 Months is OK">Yes, 3 Months is OK</option>
+            <option value="No, Looking only for Direct Paid Work from Day 1">No, Looking only for Direct Paid Work from Day 1</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="startDate">Start Date <span class="req">*</span></label>
+            <input type="text" id="startDate" placeholder="e.g. Immediately / Monday" required>
+          </div>
+          <div class="form-group">
+            <label for="currentSalary">Your Current or Last Previous Monthly Take Home Salary if u r working <span class="opt">(Optional)</span></label>
+            <input type="text" id="currentSalary" placeholder="e.g. Fresher / N/A / ₹15,000">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="freelance">Are you working on any Freelance Project,If so how many? <span class="req">*</span></label>
+          <input type="text" id="freelance" placeholder="e.g. No / Yes, 1 active project" required>
+        </div>
+
+        <!-- 4. WORK MODE & AVAILABILITY -->
+        <div class="section-divider">4. Work Mode & Availability</div>
+
+        <div class="form-group">
+          <label for="workMode">If Working then. Pls fill any one of the below here: <span class="req">*</span></label>
+          <select id="workMode" required>
+            <option value="WFH all days with Fixed Day/hrs">WFH all days with Fixed Day/hrs</option>
+            <option value="Hybrid">Hybrid</option>
+            <option value="Flexible">Flexible</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="durationTimings">Work Duration & timings you can work <span class="req">*</span></label>
+          <input type="text" id="durationTimings" placeholder="e.g. 6 to 8 hours daily (10:00 AM - 6:00 PM)" required>
+        </div>
+
+        <div class="form-group">
+          <label for="availabilitySlots">Preferred Availability (Weekday and Weekend Time Slots) <span class="req">*</span></label>
+          <input type="text" id="availabilitySlots" placeholder="e.g. Weekdays: Mon-Fri full day, Weekends: Sat morning" required>
+        </div>
+
+        <!-- Live Message Preview Box -->
+        <div class="preview-box">
+          <div class="preview-title">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+            Live WhatsApp Message Preview (Target: Anand Sir)
+          </div>
+          <pre class="preview-text" id="previewText">Loading preview...</pre>
+        </div>
+
+        <button type="submit" class="btn-submit">
+          <svg viewBox="0 0 24 24">
+            <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c4.54 0 8.24 3.7 8.24 8.24 0 2.2-.86 4.28-2.42 5.84-1.56 1.56-3.64 2.42-5.84 2.42-1.42 0-2.82-.37-4.05-1.09l-.29-.17-3.11.82.83-3.03-.19-.31c-.81-1.3-1.24-2.8-1.24-4.35 0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.24-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.34-.76-1.84-.2-.49-.4-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.28z"/>
+          </svg>
+          <span>Submit & Send to Anand Sir via WhatsApp</span>
+        </button>
+
+        <div class="status-toast" id="statusToast">
+          ✓ WhatsApp is opening! Click &quot;Send&quot; in WhatsApp to deliver your answers directly to Anand Sir.
+        </div>
+
+      </form>
+
+      <div class="portal-footer">
+        <p>© 2026 Infogenx Technologies Pvt. Ltd. • <a href="https://candidates.infogenx.com" target="_blank">Candidate Portal</a></p>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Recipient: Anand Sir
+    const RECIPIENT_PHONE = "919787806366";
+
+    // Dynamic Network Canvas identical to Candidate Portal
+    (function initCanvas() {
+      const canvas = document.getElementById('networkCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let w = (canvas.width = window.innerWidth);
+      let h = (canvas.height = window.innerHeight);
+
+      window.addEventListener('resize', () => {
+        w = canvas.width = window.innerWidth;
+        h = canvas.height = window.innerHeight;
+      });
+
+      const nodeCount = Math.min(Math.floor((w * h) / 22000), 40);
+      const nodes = [];
+      const colors = ['#00123C', '#E65525'];
+
+      for (let i = 0; i < nodeCount; i++) {
+        nodes.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: (Math.random() - 0.5) * 0.35,
+          vy: (Math.random() - 0.5) * 0.35,
+          radius: Math.random() * 2 + 1.2,
+          color: colors[Math.random() > 0.4 ? 0 : 1]
+        });
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, w, h);
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const dx = nodes[i].x - nodes[j].x;
+            const dy = nodes[i].y - nodes[j].y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 130) {
+              ctx.strokeStyle = `rgba(0, 18, 60, ${0.12 * (1 - dist / 130)})`;
+              ctx.lineWidth = 0.8;
+              ctx.beginPath();
+              ctx.moveTo(nodes[i].x, nodes[i].y);
+              ctx.lineTo(nodes[j].x, nodes[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+
+        for (const n of nodes) {
+          ctx.beginPath();
+          ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+          ctx.fillStyle = n.color;
+          ctx.globalAlpha = 0.4;
+          ctx.fill();
+          ctx.globalAlpha = 1.0;
+
+          n.x += n.vx;
+          n.y += n.vy;
+          if (n.x < 0 || n.x > w) n.vx *= -1;
+          if (n.y < 0 || n.y > h) n.vy *= -1;
+        }
+        requestAnimationFrame(draw);
+      }
+      draw();
+    })();
+
+    // WhatsApp Message Builder
+    function buildMessageText() {
+      const name = document.getElementById('fullName').value.trim() || '[Name]';
+      const mobile = document.getElementById('mobile').value.trim() || '[Contact No]';
+      const location = document.getElementById('location').value.trim() || '[Location]';
+      const role = document.getElementById('appliedRole').value;
+      const experience = document.getElementById('experience').value.trim() || '[Experience if any]';
+      const qualification = document.getElementById('qualification').value.trim() || '[Qualification]';
+      const techSkills = document.getElementById('techSkills').value.trim() || '[Tech Skills]';
+      const certification = document.getElementById('certification').value.trim() || 'None';
+      const resume = document.getElementById('resume').value.trim() || '[Google Drive Resume Link]';
+      const linkedin = document.getElementById('linkedin').value.trim() || '[LinkedIn Profile URL]';
+      const purpose = document.getElementById('purpose').value;
+      const unpaidTerms = document.getElementById('unpaidTerms').value;
+      const startDate = document.getElementById('startDate').value.trim() || '[Start Date]';
+      const currentSalary = document.getElementById('currentSalary').value.trim() || 'Fresher / N/A';
+      const freelance = document.getElementById('freelance').value.trim() || 'No';
+      const workMode = document.getElementById('workMode').value;
+      const durationTimings = document.getElementById('durationTimings').value.trim() || '[Work Duration & timings]';
+      const availabilitySlots = document.getElementById('availabilitySlots').value.trim() || '[Preferred Availability]';
+
+      return `Hi Anand Sir, I am submitting my Application Details for Infogenx:
+
+Name: ${name}
+Contact No: ${mobile}
+Location: ${location}
+Applying For: ${role}
+Experience if any: ${experience}
+Qualification: ${qualification}
+Tech Skills: ${techSkills}
+Certification if any: ${certification}
+Google Drive Resume URL (Link): ${resume}
+LinkedIn profile URL: ${linkedin}
+
+Propose of this Internship if you are choosing this option: 
+Choose any one of the below here > : 
+* ${purpose}
+
+Unpaid Internship is ok for you?, if so how many months is ok?: ${unpaidTerms}
+Start Date: ${startDate}
+Your Current or Last Previous Monthly Take Home Salary if u r working: ${currentSalary}
+Are you working on any Freelance Project,If so how many? : ${freelance}
+
+If Working then. Pls fill any one of the below here > : 
+* ${workMode}
+
+Work Duration & timings you can work : ${durationTimings}
+Preferred Availability (Weekday and Weekend Time Slots) : ${availabilitySlots}
+
+Please review my application for Infogenx Technologies.`;
+    }
+
+    function updateMessagePreview() {
+      const msg = buildMessageText();
+      document.getElementById('previewText').textContent = `Target: Anand Sir (+91 9787806366)\n\n${msg}`;
+      return msg;
+    }
+
+    document.querySelectorAll('input, select').forEach(el => {
+      el.addEventListener('input', updateMessagePreview);
+    });
+
+    updateMessagePreview();
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      const msg = buildMessageText();
+      
+      const toast = document.getElementById('statusToast');
+      toast.style.display = 'block';
+
+      const waUrl = `https://wa.me/${RECIPIENT_PHONE}?text=${encodeURIComponent(msg)}`;
+      window.open(waUrl, '_blank');
+    }
+  </script>
+</body>
+</html>
