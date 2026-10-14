@@ -1,6 +1,7 @@
 import express from 'express';
 import { google } from 'googleapis';
 import nodemailer from 'nodemailer';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -8,6 +9,35 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const router = express.Router();
+
+// Helper to store unsaved submissions locally under a designated label
+export async function storeUnsavedSubmissionLocally(record) {
+  try {
+    const storageDir = path.resolve(__dirname, '../storage');
+    if (!fs.existsSync(storageDir)) {
+      fs.mkdirSync(storageDir, { recursive: true });
+    }
+    const filePath = path.join(storageDir, 'unsaved_applications.json');
+    let list = [];
+    if (fs.existsSync(filePath)) {
+      try {
+        const raw = fs.readFileSync(filePath, 'utf-8');
+        list = JSON.parse(raw) || [];
+      } catch (parseErr) {
+        list = [];
+      }
+    }
+    list.push({
+      label: 'UNSAVED_APPLICATION',
+      loggedAt: new Date().toISOString(),
+      ...record
+    });
+    fs.writeFileSync(filePath, JSON.stringify(list, null, 2), 'utf-8');
+    console.log('[Apply API] Stored failed submission in storage/unsaved_applications.json with label UNSAVED_APPLICATION');
+  } catch (storeErr) {
+    console.error('[Apply API] Failed to store backup application file:', storeErr.message);
+  }
+}
 
 // Helper to extract Google Sheet ID from either full URL or direct ID
 export function extractSpreadsheetId(linkOrId) {
@@ -68,25 +98,21 @@ function getEmailTransporter() {
 }
 
 // Send Email Notification to Job Email (infogenx.jobs@gmail.com)
-export async function sendJobEmailNotification({ candidateData, sheetSuccess, sheetError, targetSheet, targetLink }) {
+// ONLY triggered when Google Sheet save fails
+export async function sendJobEmailNotification({ candidateData, sheetSuccess, sheetError, targetSheet, targetLink, label = 'UNSAVED_APPLICATION' }) {
   try {
     const notifyEmail = process.env.JOB_NOTIFY_EMAIL || process.env.SMTP_USER || 'infogenx.jobs@gmail.com';
     const transporter = getEmailTransporter();
 
-    const isFailure = !sheetSuccess;
-    const subject = isFailure 
-      ? `🚨 [ALERT: Sheet Save Failed] Candidate Application: ${candidateData.name || 'Candidate'} (${candidateData.applicationType || 'Role'} - ${candidateData.appliedRole || 'Position'})`
-      : `📥 [New Application] ${candidateData.name || 'Candidate'} - ${candidateData.applicationType || 'Role'} (${candidateData.appliedRole || 'Position'})`;
+    const subject = `[${label}] 🚨 Sheet Save Failed: ${candidateData.name || 'Candidate'} (${candidateData.applicationType || 'Role'} - ${candidateData.appliedRole || 'Position'})`;
 
-    const statusBanner = isFailure
-      ? `<div style="background: #fee2e2; border-left: 5px solid #dc2626; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; color: #991b1b; font-weight: bold;">
-          ⚠️ GOOGLE SHEET STORAGE FAILED:<br>
-          <span style="font-weight: normal; font-size: 13px;">Error Details: ${sheetError || 'Unknown error'}</span><br>
-          <span style="font-weight: normal; font-size: 12px; color: #7f1d1d;">Candidate application details have been safely captured below for your review.</span>
-         </div>`
-      : `<div style="background: #ecfdf5; border-left: 5px solid #10b981; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; color: #065f46; font-weight: bold;">
-          ✓ Recorded successfully into Google Sheet: <a href="${targetLink || '#'}" target="_blank" style="color: #047857; text-decoration: underline;">${targetSheet || 'Open Sheet'}</a>
-         </div>`;
+    const statusBanner = `
+      <div style="background: #fee2e2; border-left: 5px solid #dc2626; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; color: #991b1b; font-weight: bold;">
+        🏷️ LABEL: [${label}] - GOOGLE SHEET STORAGE FAILED<br>
+        <span style="font-weight: normal; font-size: 13px;">Target Sheet ID: ${targetSheet || 'N/A'}</span><br>
+        <span style="font-weight: normal; font-size: 13px;">Error Details: ${sheetError || 'Failed to save to Google Sheets'}</span><br>
+        <span style="font-weight: normal; font-size: 12px; color: #7f1d1d;">Application has been securely saved in local backup storage (storage/unsaved_applications.json). Full candidate details are listed below:</span>
+      </div>`;
 
     const phoneClean = (candidateData.mobile || '').replace(/[^0-9]/g, '');
 
@@ -112,8 +138,8 @@ export async function sendJobEmailNotification({ candidateData, sheetSuccess, sh
     <body>
       <div class="card">
         <div class="hdr">
-          <h2>Candidate Application Received</h2>
-          <div style="font-size: 13px; opacity: 0.9; margin-top: 4px;">Infogenx Technologies Candidate Portal</div>
+          <h2>Candidate Application Alert</h2>
+          <div style="font-size: 13px; opacity: 0.9; margin-top: 4px;">Label: ${label} • Infogenx Candidate Portal</div>
         </div>
         <div class="body">
           ${statusBanner}
@@ -155,13 +181,18 @@ export async function sendJobEmailNotification({ candidateData, sheetSuccess, sh
       from: `"Infogenx Candidate Portal" <${process.env.SMTP_USER || 'infogenx.jobs@gmail.com'}>`,
       to: notifyEmail,
       subject,
+      headers: {
+        'X-Label': label,
+        'X-Category': 'Unsaved-Applications',
+        'X-Priority': '1'
+      },
       html
     });
 
-    console.log(`[Apply API] Email notification sent to ${notifyEmail} (Message ID: ${info.messageId})`);
+    console.log(`[Apply API] Failure alert email sent to ${notifyEmail} [Label: ${label}] (Message ID: ${info.messageId})`);
     return { success: true, messageId: info.messageId };
   } catch (err) {
-    console.error('[Apply API] Failed to send email notification to job email:', err.message);
+    console.error('[Apply API] Failed to send email alert to job email:', err.message);
     return { success: false, error: err.message };
   }
 }
@@ -272,31 +303,44 @@ router.post('/submit', async (req, res) => {
     console.error('[Apply API] Unexpected error in application submission flow:', error);
   }
 
-  // Always send email notification to the job email (infogenx.jobs@gmail.com)
-  // Especially if sheet save failed, this guarantees zero data loss!
-  const emailResult = await sendJobEmailNotification({
-    candidateData: req.body,
-    sheetSuccess,
-    sheetError,
-    targetSheet: targetConfig?.id,
-    targetLink: targetConfig?.rawLink
-  });
-
+  // ONLY send email notification if Google Sheet save FAILED!
+  // "summission aagama irunthaa mattum ella time mu vendaam oru label create panni athula store aagi iruka vendum"
   if (!sheetSuccess) {
+    // 1. Store locally in persistent storage with designated label
+    await storeUnsavedSubmissionLocally({
+      label: 'UNSAVED_APPLICATION',
+      targetSheet: targetConfig?.id,
+      targetTab: targetConfig?.tab,
+      error: sheetError,
+      candidateData: req.body
+    });
+
+    // 2. Alert the job email with explicit label
+    const emailResult = await sendJobEmailNotification({
+      candidateData: req.body,
+      sheetSuccess: false,
+      sheetError,
+      targetSheet: targetConfig?.id,
+      targetLink: targetConfig?.rawLink,
+      label: 'UNSAVED_APPLICATION'
+    });
+
     return res.status(200).json({
       success: false,
       sheetStored: false,
       emailNotified: emailResult.success,
-      message: 'Could not record to Google Sheet, but full candidate application notified to job email',
+      label: 'UNSAVED_APPLICATION',
+      message: 'Could not record to Google Sheet. Candidate application stored in local backup under label UNSAVED_APPLICATION and notified to job email.',
       error: sheetError
     });
   }
 
+  // Sheet success: do NOT send email every time!
   return res.json({
     success: true,
     sheetStored: true,
-    emailNotified: emailResult.success,
-    message: `Application recorded into ${usedTab} successfully and notified to job email`,
+    emailNotified: false,
+    message: `Application recorded into ${usedTab} successfully`,
     targetSheet: targetConfig?.id,
     targetLink: targetConfig?.rawLink
   });

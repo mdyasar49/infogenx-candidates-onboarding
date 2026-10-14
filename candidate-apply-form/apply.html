@@ -1464,18 +1464,26 @@ Please review my application for Infogenx Technologies.`;
         const res = await Promise.race([
           fetch('/api/apply/submit', {
             method: 'POST',
+            keepalive: true,
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(formData)
           }).then(r => r.json()),
-          new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 1500))
+          new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 3500))
         ]);
         console.log('[Candidate Portal API]', res);
+        if (res && res.sheetStored) {
+          toast.textContent = '✓ Application recorded in Google Sheet! Launching WhatsApp...';
+        } else if (res && res.emailNotified) {
+          toast.textContent = '✓ Application received and notified! Launching WhatsApp...';
+        } else {
+          toast.textContent = '✓ Application captured! Launching WhatsApp...';
+        }
       } catch (err) {
         console.warn('[Candidate Portal API]', err);
+        toast.textContent = '✓ Launching WhatsApp to send directly to HR...';
       }
 
-      // 3. Launch WhatsApp to HR Team
-      toast.textContent = '✓ Application recorded in Google Sheet! Launching WhatsApp to send directly to the Infogenx HR Team...';
+      // 3. Launch WhatsApp directly to Anand Sir (+91 97878 06366)
       const waUrl = `https://wa.me/${RECIPIENT_PHONE}?text=${encodeURIComponent(msg)}`;
       window.open(waUrl, '_blank');
     }
