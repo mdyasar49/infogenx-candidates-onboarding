@@ -1535,20 +1535,22 @@ Please review my application for Infogenx Technologies.`;
         availabilitySlots: document.getElementById('availabilitySlots').value.trim()
       };
 
-      // 2. Asynchronously save to Google Sheets via Candidate Portal Backend
+      // 2. Save to Google Sheets via Candidate Portal Backend
       try {
-        fetch('/api/apply/submit', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(formData)
-        }).then(r => r.json()).then(res => {
-          console.log('[Candidate Portal API]', res);
-        }).catch(err => {
-          console.warn('[Candidate Portal API]', err);
-        });
-      } catch (err) { }
+        const res = await Promise.race([
+          fetch('/api/apply/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(formData)
+          }).then(r => r.json()),
+          new Promise(resolve => setTimeout(() => resolve({ timeout: true }), 1500))
+        ]);
+        console.log('[Candidate Portal API]', res);
+      } catch (err) {
+        console.warn('[Candidate Portal API]', err);
+      }
 
-      // 3. Immediately launch WhatsApp to HR Team
+      // 3. Launch WhatsApp to HR Team
       toast.textContent = '✓ Application recorded in Google Sheet! Launching WhatsApp to send directly to the Infogenx HR Team...';
       const waUrl = `https://wa.me/${RECIPIENT_PHONE}?text=${encodeURIComponent(msg)}`;
       window.open(waUrl, '_blank');
