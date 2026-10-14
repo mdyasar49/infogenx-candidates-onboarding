@@ -645,66 +645,45 @@
       draw();
     })();
 
-    // Role options mapping for Internship vs Job
-    const roleOptions = {
-      "Internship": [
-        "HR Intern / Trainee",
-        "Graphic Designer Intern",
-        "Digital Marketing Intern",
-        "Web / Full Stack Developer Intern",
-        "Odoo ERP Intern",
-        "Zoho Developer Intern",
-        "Business Development / Sales Intern",
-        "Other Internship Opportunity"
-      ],
-      "Job / Trainee": [
-        "Graphic Designer",
-        "HR Executive / Recruiter",
-        "Digital Marketing Specialist",
-        "Odoo ERP Developer / Consultant",
-        "Zoho Developer / Consultant",
-        "Full Stack Developer",
-        "Business Development / Sales Executive",
-        "Other Job Position"
-      ],
-      "Freelance": [
-        "Graphic Designer (Freelance)",
-        "Digital Marketing Specialist (Freelance)",
-        "Web / Full Stack Developer (Freelance)",
-        "Odoo ERP Consultant (Freelance)",
-        "Zoho Developer / Consultant (Freelance)",
-        "HR Consultant / Recruiter (Freelance)",
-        "Other Freelance Project Role"
-      ]
-    };
+    // Standard roles list (same core options across all types)
+    const standardRoles = [
+      "Graphic Designer",
+      "HR / Recruiter",
+      "Digital Marketing",
+      "Web / Full Stack Developer",
+      "Odoo ERP Developer / Consultant",
+      "Zoho Developer / Consultant",
+      "Business Development / Sales",
+      "Content & Copywriter",
+      "Other"
+    ];
 
     function handleTypeChange() {
       const type = document.getElementById('applicationType').value;
       const roleSelect = document.getElementById('appliedRole');
       const roleLabel = document.getElementById('roleLabelText');
-      const roles = roleOptions[type] || roleOptions["Internship"];
 
       if (roleLabel) {
         if (type === "Internship") {
-          roleLabel.textContent = "Internship Opportunity (Role)";
+          roleLabel.textContent = "Internship Role";
         } else if (type === "Freelance") {
           roleLabel.textContent = "Freelance Project Role";
         } else {
-          roleLabel.textContent = "Job Opening (Role)";
+          roleLabel.textContent = "Job / Trainee Role";
         }
       }
 
       roleSelect.innerHTML = '';
       const optGroup = document.createElement('optgroup');
       if (type === "Internship") {
-        optGroup.label = "Internship Opportunities";
+        optGroup.label = "Internship Roles";
       } else if (type === "Freelance") {
         optGroup.label = "Freelance Project Roles";
       } else {
-        optGroup.label = "Job / Trainee Openings";
+        optGroup.label = "Job / Trainee Roles";
       }
 
-      roles.forEach(r => {
+      standardRoles.forEach(r => {
         const opt = document.createElement('option');
         opt.value = r;
         opt.textContent = r;
