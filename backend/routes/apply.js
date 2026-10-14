@@ -8,8 +8,21 @@ const __dirname = path.dirname(__filename);
 
 const router = express.Router();
 
-const SHEET_ID = '13mW68lcoaZ9dtc_h--TLYki4dR-8xwZEh1ndGxVkorY';
-const TAB_NAME = 'Direct Candidate Applications';
+// 3 Dedicated Google Spreadsheets partitioned by Application Type
+const SPREADSHEETS_BY_TYPE = {
+  'Internship': {
+    id: '1LAsfnvSNBpr2WzRPyqbBSaNMsLbNU-rl1QxGPXiTpsA',
+    tab: 'Internship Applications'
+  },
+  'Job / Trainee': {
+    id: '14Ccmt5lN_JnKGHmW1fgFiRefZoECqrPWHe4VWZXk_MA',
+    tab: 'Job Applications'
+  },
+  'Freelance': {
+    id: '1TgvY9gWS5VpUM8AMbHuH4VydwkxwOFPjo784iJBtfEY',
+    tab: 'Freelance Applications'
+  }
+};
 
 // Initialize Google Sheets API Auth
 const keyFile = path.resolve(__dirname, '../credentials/service-account.json');
@@ -24,6 +37,7 @@ router.post('/submit', async (req, res) => {
       name,
       mobile,
       location,
+      applicationType,
       appliedRole,
       experience,
       qualification,
@@ -32,7 +46,6 @@ router.post('/submit', async (req, res) => {
       resumeUrl,
       linkedinUrl,
       purpose,
-      unpaidTerms,
       startDate,
       currentSalary,
       freelance,
@@ -40,6 +53,16 @@ router.post('/submit', async (req, res) => {
       durationTimings,
       availabilitySlots
     } = req.body;
+
+    // Determine target spreadsheet strictly based on applicationType
+    let targetConfig = SPREADSHEETS_BY_TYPE['Job / Trainee'];
+    const appTypeNorm = (applicationType || '').toLowerCase();
+
+    if (appTypeNorm.includes('intern')) {
+      targetConfig = SPREADSHEETS_BY_TYPE['Internship'];
+    } else if (appTypeNorm.includes('free')) {
+      targetConfig = SPREADSHEETS_BY_TYPE['Freelance'];
+    }
 
     const sheets = google.sheets({ version: 'v4', auth });
     const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
@@ -49,6 +72,7 @@ router.post('/submit', async (req, res) => {
       name || '',
       mobile || '',
       location || '',
+      applicationType || 'Internship',
       appliedRole || '',
       experience || '',
       qualification || '',
@@ -57,7 +81,6 @@ router.post('/submit', async (req, res) => {
       resumeUrl || '',
       linkedinUrl || '',
       purpose || '',
-      unpaidTerms || '',
       startDate || '',
       currentSalary || '',
       freelance || '',
@@ -68,8 +91,8 @@ router.post('/submit', async (req, res) => {
     ];
 
     await sheets.spreadsheets.values.append({
-      spreadsheetId: SHEET_ID,
-      range: `'${TAB_NAME}'!A:T`,
+      spreadsheetId: targetConfig.id,
+      range: `'${targetConfig.tab}'!A:T`,
       valueInputOption: 'USER_ENTERED',
       insertDataOption: 'INSERT_ROWS',
       requestBody: {
@@ -77,9 +100,12 @@ router.post('/submit', async (req, res) => {
       }
     });
 
+    console.log(`[Apply API] Recorded submission for ${name} (${applicationType}) to Sheet: ${targetConfig.id} [${targetConfig.tab}]`);
+
     return res.json({
       success: true,
-      message: 'Application recorded into Google Sheet successfully'
+      message: `Application recorded into ${targetConfig.tab} successfully`,
+      targetSheet: targetConfig.id
     });
   } catch (error) {
     console.error('Error saving application to Google Sheet:', error);

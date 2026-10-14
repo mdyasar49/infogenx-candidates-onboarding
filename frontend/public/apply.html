@@ -428,6 +428,7 @@
             <select id="applicationType" required onchange="handleTypeChange()">
               <option value="Internship">🎓 Internship (Learn & Gain Experience)</option>
               <option value="Job / Trainee">💼 Direct Job / Trainee Role</option>
+              <option value="Freelance">💻 Freelance / Contract Work</option>
             </select>
           </div>
           <div class="form-group">
@@ -638,6 +639,16 @@
         "Full Stack Developer",
         "Business Development / Sales Executive",
         "Other Job Position"
+      ],
+      "Freelance": [
+        "Graphic Designer (Freelance)",
+        "Digital Marketing Specialist (Freelance)",
+        "Web / Full Stack Developer (Freelance)",
+        "Odoo ERP Consultant (Freelance)",
+        "Zoho Developer / Consultant (Freelance)",
+        "HR Consultant / Recruiter (Freelance)",
+        "Content & Copywriter (Freelance)",
+        "Other Freelance Project Role"
       ]
     };
 
@@ -648,12 +659,24 @@
       const roles = roleOptions[type] || roleOptions["Internship"];
 
       if (roleLabel) {
-        roleLabel.textContent = type === "Internship" ? "Internship Opportunity (Role)" : "Job Opening (Role)";
+        if (type === "Internship") {
+          roleLabel.textContent = "Internship Opportunity (Role)";
+        } else if (type === "Freelance") {
+          roleLabel.textContent = "Freelance Project Role";
+        } else {
+          roleLabel.textContent = "Job Opening (Role)";
+        }
       }
 
       roleSelect.innerHTML = '';
       const optGroup = document.createElement('optgroup');
-      optGroup.label = type === "Internship" ? "🎓 Internship Opportunities" : "💼 Job / Trainee Openings";
+      if (type === "Internship") {
+        optGroup.label = "🎓 Internship Opportunities";
+      } else if (type === "Freelance") {
+        optGroup.label = "💻 Freelance Project Roles";
+      } else {
+        optGroup.label = "💼 Job / Trainee Openings";
+      }
 
       roles.forEach(r => {
         const opt = document.createElement('option');
@@ -746,7 +769,8 @@ Please review my application for Infogenx Technologies.`;
         name: document.getElementById('fullName').value.trim(),
         mobile: document.getElementById('mobile').value.trim(),
         location: document.getElementById('location').value.trim(),
-        appliedRole: `${document.getElementById('applicationType').value} - ${document.getElementById('appliedRole').value}`,
+        applicationType: document.getElementById('applicationType').value,
+        appliedRole: document.getElementById('appliedRole').value,
         experience: document.getElementById('experience').value.trim(),
         qualification: document.getElementById('qualification').value.trim(),
         techSkills: document.getElementById('techSkills').value.trim(),
