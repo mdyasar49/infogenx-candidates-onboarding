@@ -5,7 +5,10 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Infogenx Technologies - Job & Internship Application Portal</title>
-  <link rel="icon" type="image/png" href="/logo.png">
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAAe1BMVEX////wWSs3T2z34dkaN1ns7/AqRGT+/v4SMFT7+/r09fZHXXeSoK779PAhPV7xuKRYa4Hc4ORmeI21v8jQ19zEy9L57Ofuflvk5+rtkXPuYDT11MiGkqHvpY3ta0Lyxbakr7vsc012hZamj4/SjXnfgGPIrqnZo5PVy8l2/u+4AAAB/UlEQVR42mWS2XalIBREIyjKIOCEcxzu7aT//wu7AF12Vs4b1KbOxEeMPM+5qDpliS4KTepG5LjkPM8ffWhOyXRaIFK5C39Vgrh10S5EQ9OaMUbOikOnht4AzxrL8JLJelFKNdB5OY/9VubxfdbItEhJvbdDhhCXfhgAwb+xaaHtXnklRwT/1YyrCwBva+h1l4WiL6B0FEwA+LAwr4vYFLSSI0pK6RxSiE6isc43Fni6bRQINQ595nAcFl0wBf8Ybj2OkXK3GXc5tjCw7a3zuU+SY0YTWxkBsTNvACkbMgHrfpr6ma5wCUDIQDocsm7HiERpxt7Ma29cBPhQp6mtcu/QKns2g6No8OjnoAOobJrWQ8xfKSlVxZ3pP1d3L7KShT4BxJUqQhQ1/eQNHgAOAK6hyuW7n2DwADbWcK29e72PZBphcAMospAtj1vBfMZPzAEzuAGe+UE2Im7Ip0+Sp0IEdk18ldzL4Xky/fnKHgB1WeTohKNmPKagv/BpPx4iUwwWf9E75KBLtvyw6PDfyPKGu9fHr6etCMCCFAV5gfD1zZ0/oa0H4NWp8WXP9/HZGyoAhLb+J7pa49K+vjfHeQD27AHCr6tZAROrmrbdGQD1E8hFe5IUCCNEkvQXEOrYLYNyhY7AE9d3IUynCM3k/gsISLPUEknqpRnubf4DMkgp98vv5oYAAAAASUVORK5CYII=">
+  <link rel="icon" type="image/png" href="/infogenx-title-icon.png">
+  <link rel="shortcut icon" type="image/png" href="/infogenx-title-icon.png">
+  <link rel="apple-touch-icon" href="/infogenx-title-icon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
@@ -85,20 +88,84 @@
       box-shadow: 0 24px 60px rgba(0, 18, 60, 0.12), 0 6px 20px rgba(230, 85, 37, 0.08);
     }
 
-    /* Logo & Header */
-    .hero-logo-wrap {
+    /* Twilio Dialer Style Logo & Header */
+    .header-logo-container {
       text-align: center;
-      margin-bottom: 24px;
+      margin-bottom: 22px;
     }
 
-    .hero-logo {
-      width: 220px;
-      height: auto;
-      max-height: 70px;
+    .logo-wrapper {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      padding: 0.5rem 0.5rem 0.2rem;
+    }
+
+    .logo-wrapper img {
+      max-height: 42px;
+      width: auto;
       object-fit: contain;
-      margin: 0 auto;
       display: block;
       filter: drop-shadow(0 2px 8px rgba(0, 18, 60, 0.06));
+    }
+
+    .logo-lines {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      min-width: 250px;
+      gap: 4px;
+      padding: 0 0.5rem;
+      margin-top: 0.5rem;
+    }
+
+    .logo-line {
+      height: 1.5px;
+      border-radius: 2px;
+      background: rgba(0, 18, 60, 0.08);
+    }
+
+    .logo-line-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .logo-line-center::before,
+    .logo-line-center::after {
+      content: "";
+      flex: 1;
+      height: 1.5px;
+      background: linear-gradient(90deg, transparent, #d33e00 80%, #d33e00);
+    }
+
+    .logo-line-center::after {
+      background: linear-gradient(90deg, #d33e00, transparent);
+    }
+
+    .logo-tag {
+      background: rgba(211, 62, 0, 0.12);
+      padding: 0.16rem 0.65rem;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 0.65rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      display: inline-block;
+      line-height: 1.4;
+      flex-shrink: 0;
+      margin: 0 8px;
+      white-space: nowrap;
+    }
+
+    .logo-tag span {
+      background: conic-gradient(at 50% 0%, #b23f0d 0deg, #b23f0d 110deg, #00123C 175deg, #00123C 180deg);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
     }
 
     .welcome-header {
@@ -159,7 +226,70 @@
       border: 1px solid #bfdbfe;
     }
 
-    /* Recipient Notification Box */
+    /* Recipient Notification & Toggle Box */
+    .recipient-card {
+      background: #f8fafc;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .recipient-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--navy-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .recipient-title svg {
+      color: var(--orange-blood);
+    }
+
+    .recipient-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    @media (max-width: 560px) {
+      .recipient-options {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .radio-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 10px 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 13px;
+    }
+
+    .radio-pill input[type="radio"] {
+      accent-color: var(--orange-blood);
+      cursor: pointer;
+      width: 16px;
+      height: 16px;
+    }
+
+    .radio-pill.selected {
+      border-color: var(--orange-blood);
+      background: #fff8f5;
+      box-shadow: 0 2px 8px rgba(230, 85, 37, 0.12);
+    }
+
     .recipient-info-box {
       display: flex;
       align-items: center;
@@ -265,6 +395,152 @@
     select {
       cursor: pointer;
     }
+
+    /* ========================================================
+       AUTOSUGGEST FREESOLO COMBOBOX STYLING
+       ======================================================== */
+    .freesolo-container {
+      position: relative;
+      width: 100%;
+    }
+
+    .freesolo-input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+
+    .freesolo-input {
+      width: 100%;
+      padding-right: 40px !important;
+      cursor: text;
+    }
+
+    .freesolo-toggle-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      margin: 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #64748b;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      z-index: 2;
+    }
+
+    .freesolo-toggle-btn:hover {
+      color: var(--orange-blood);
+      background: rgba(230, 85, 37, 0.1);
+    }
+
+    .freesolo-toggle-btn svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s ease;
+    }
+
+    .freesolo-container.open .freesolo-toggle-btn svg {
+      transform: rotate(180deg);
+      color: var(--orange-blood);
+    }
+
+    .freesolo-dropdown {
+      position: absolute;
+      top: calc(100% + 4px);
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1.5px solid #cbd5e1;
+      border-radius: 12px;
+      box-shadow: 0 12px 28px rgba(0, 18, 60, 0.14), 0 4px 10px rgba(0, 0, 0, 0.05);
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 1050;
+      display: none;
+      padding: 6px;
+      background-clip: padding-box;
+    }
+
+    .freesolo-container.open .freesolo-dropdown {
+      display: block;
+      animation: freesoloFade 0.16s ease-out;
+    }
+
+    @keyframes freesoloFade {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .freesolo-option {
+      padding: 9px 12px;
+      font-size: 13.5px;
+      color: var(--navy-primary);
+      border-radius: 8px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.12s ease;
+      user-select: none;
+    }
+
+    .freesolo-option:hover,
+    .freesolo-option.highlighted {
+      background: #fff7ed;
+      color: var(--orange-blood);
+      font-weight: 600;
+    }
+
+    .freesolo-option.selected {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: var(--navy-primary);
+    }
+
+    .freesolo-custom-item {
+      padding: 8px 12px;
+      font-size: 12px;
+      color: #475569;
+      background: #f8fafc;
+      border-radius: 6px;
+      border: 1px dashed #cbd5e1;
+      margin-top: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    .freesolo-custom-item:hover {
+      background: #fff7ed;
+      border-color: var(--orange-blood);
+      color: var(--orange-blood);
+    }
+
+    .freesolo-custom-item b {
+      color: var(--navy-primary);
+      font-weight: 700;
+    }
+
+    .freesolo-hint {
+      font-size: 11px;
+      color: #94a3b8;
+      margin-top: 3px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
 
     .field-hint {
       font-size: 11px;
@@ -380,10 +656,19 @@
   <div class="page-wrapper">
     <div class="portal-card">
 
-      <!-- Logo Header -->
-      <div class="hero-logo-wrap">
-        <img src="/logo.png" alt="Infogenx Technologies" class="hero-logo"
-          onerror="this.src='https://candidates.infogenx.com/logo.png'">
+      <!-- Logo Header styled as in Twilio Dialer -->
+      <div class="header-logo-container">
+        <div class="logo-wrapper">
+          <img src="/logo.png" alt="Infogenx Logo" id="infogenx-logo"
+            onerror="this.src='https://twilliodialer.infogenx.com/static/dialer/images/logo.png'">
+          <div class="logo-lines">
+            <div class="logo-line"></div>
+            <div class="logo-line-center">
+              <span class="logo-tag"><span>Application Portal</span></span>
+            </div>
+            <div class="logo-line"></div>
+          </div>
+        </div>
       </div>
 
       <div class="welcome-header">
@@ -399,14 +684,29 @@
         </div>
       </div>
 
-      <!-- HR Team Notice -->
-      <div class="recipient-info-box">
-        <svg viewBox="0 0 24 24">
-          <path
-            d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c4.54 0 8.24 3.7 8.24 8.24 0 2.2-.86 4.28-2.42 5.84-1.56 1.56-3.64 2.42-5.84 2.42-1.42 0-2.82-.37-4.05-1.09l-.29-.17-3.11.82.83-3.03-.19-.31c-.81-1.3-1.24-2.8-1.24-4.35 0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.24-.75-.67-1.26-1.5-1.41-1.75-.14-.25-.02-.39.11-.51.11-.11.25-.29.38-.44.13-.14.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.34-.76-1.84-.2-.49-.4-.42-.56-.43h-.48c-.17 0-.44.06-.67.31-.23.25-.88.86-.88 2.1 0 1.24.9 2.44 1.03 2.61.13.17 1.77 2.7 4.29 3.79.6.26 1.07.41 1.44.53.6.19 1.15.16 1.58.1.48-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.06-.1-.23-.16-.48-.28z" />
-        </svg>
-        <div>
-          <strong>Infogenx HR Recruitment:</strong> Submissions are routed directly to the Infogenx HR Team via official WhatsApp.
+      <!-- Recipient Routing Card -->
+      <div class="recipient-card">
+        <div class="recipient-title">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+          Direct WhatsApp Delivery Target:
+        </div>
+        <div class="recipient-options">
+          <label class="radio-pill selected" id="optAnand">
+            <input type="radio" name="recipientTarget" value="anand" checked onchange="updateRecipient()">
+            <div>
+              <strong style="color: var(--navy-primary); display: block;">Anand Sir (HR)</strong>
+              <span style="font-size: 11px; color: #64748b;">+91 97878 06366 (Production)</span>
+            </div>
+          </label>
+          <label class="radio-pill" id="optTest">
+            <input type="radio" name="recipientTarget" value="test" onchange="updateRecipient()">
+            <div>
+              <strong style="color: var(--navy-primary); display: block;">Verification Test</strong>
+              <span style="font-size: 11px; color: #64748b;">+91 90259 43184 (Testing)</span>
+            </div>
+          </label>
         </div>
       </div>
 
@@ -440,30 +740,58 @@
         <div class="form-row">
           <div class="form-group">
             <label for="applicationType">Application Type <span class="req">*</span></label>
-            <select id="applicationType" required onchange="handleTypeChange()">
-              <option value="Internship">Internship (Learn & Gain Experience)</option>
-              <option value="Job / Trainee">Direct Job / Trainee Role</option>
-              <option value="Freelance">Freelance</option>
-            </select>
+            <div class="freesolo-container" id="wrap_applicationType">
+              <div class="freesolo-input-wrap">
+                <input type="text" id="applicationType" class="freesolo-input" placeholder="Select or type e.g. Internship" required autocomplete="off">
+                <button type="button" class="freesolo-toggle-btn" tabindex="-1" title="Show suggestions" aria-label="Toggle options">
+                  <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+                </button>
+              </div>
+              <div class="freesolo-dropdown" role="listbox"></div>
+            </div>
+            <div class="freesolo-hint">Select from dropdown or type any custom type freely</div>
           </div>
           <div class="form-group">
-            <label for="appliedRole"><span id="roleLabelText">Internship Opportunity (Role)</span> <span
-                class="req">*</span></label>
-            <select id="appliedRole" required>
-              <!-- Populated dynamically based on Application Type -->
-            </select>
+            <label for="appliedRole"><span id="roleLabelText">Opportunity (Role)</span> <span class="req">*</span></label>
+            <div class="freesolo-container" id="wrap_appliedRole">
+              <div class="freesolo-input-wrap">
+                <input type="text" id="appliedRole" class="freesolo-input" placeholder="Select or type e.g. Graphic Designer" required autocomplete="off">
+                <button type="button" class="freesolo-toggle-btn" tabindex="-1" title="Show suggestions" aria-label="Toggle options">
+                  <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+                </button>
+              </div>
+              <div class="freesolo-dropdown" role="listbox"></div>
+            </div>
+            <div class="freesolo-hint">Select a preset role or type your exact custom job title</div>
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="experience">Experience if any <span class="req">*</span></label>
-            <input type="text" id="experience" placeholder="e.g. Fresher / 6 months experience" required>
+            <div class="freesolo-container" id="wrap_experience">
+              <div class="freesolo-input-wrap">
+                <input type="text" id="experience" class="freesolo-input" placeholder="Select or type e.g. Fresher / 6 months" required autocomplete="off">
+                <button type="button" class="freesolo-toggle-btn" tabindex="-1" title="Show suggestions" aria-label="Toggle options">
+                  <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+                </button>
+              </div>
+              <div class="freesolo-dropdown" role="listbox"></div>
+            </div>
+            <div class="freesolo-hint">Select or type custom years/months</div>
           </div>
           <div class="form-group">
             <label for="qualification">Qualification <span class="req">*</span></label>
-            <input type="text" id="qualification" placeholder="e.g. MBA / BBA / B.E / B.Tech / B.Com / B.Sc (2024)"
-              required>
+            <div class="freesolo-container" id="wrap_qualification">
+              <div class="freesolo-input-wrap">
+                <input type="text" id="qualification" class="freesolo-input" placeholder="Select or type e.g. B.E / B.Tech / MBA (2024)" required autocomplete="off">
+                <button type="button" class="freesolo-toggle-btn" tabindex="-1" title="Show suggestions" aria-label="Toggle options">
+                  <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+                </button>
+              </div>
+              <div class="freesolo-dropdown" role="listbox"></div>
+            </div>
+            <div class="freesolo-hint">Select degree or type your exact college / degree</div>
           </div>
         </div>
 
@@ -495,29 +823,58 @@
 
         <div class="form-group">
           <label for="purpose">Purpose of this Application / Internship <span class="req">*</span></label>
-          <select id="purpose" required>
-            <option value="Just to Learn and gain experience">Just to Learn and gain experience</option>
-            <option value="Learn and Earn">Learn and Earn</option>
-            <option value="Only to Earn">Only to Earn</option>
-          </select>
+          <div class="freesolo-container" id="wrap_purpose">
+            <div class="freesolo-input-wrap">
+              <input type="text" id="purpose" class="freesolo-input" placeholder="Select or type your purpose" required autocomplete="off">
+              <button type="button" class="freesolo-toggle-btn" tabindex="-1" title="Show suggestions" aria-label="Toggle options">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+            </div>
+            <div class="freesolo-dropdown" role="listbox"></div>
+          </div>
+          <div class="freesolo-hint">Select a preset purpose or type your own reason</div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="startDate">Start Date <span class="req">*</span></label>
-            <input type="text" id="startDate" placeholder="e.g. Immediately / Monday" required>
+            <div class="freesolo-container" id="wrap_startDate">
+              <div class="freesolo-input-wrap">
+                <input type="text" id="startDate" class="freesolo-input" placeholder="Select or type e.g. Immediately" required autocomplete="off">
+                <button type="button" class="freesolo-toggle-btn" tabindex="-1" title="Show suggestions" aria-label="Toggle options">
+                  <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+                </button>
+              </div>
+              <div class="freesolo-dropdown" role="listbox"></div>
+            </div>
           </div>
           <div class="form-group">
             <label for="currentSalary">Your Current or Last Monthly Salary if working <span
                 class="opt">(Optional)</span></label>
-            <input type="text" id="currentSalary" placeholder="e.g. Fresher / N/A / ₹15,000">
+            <div class="freesolo-container" id="wrap_currentSalary">
+              <div class="freesolo-input-wrap">
+                <input type="text" id="currentSalary" class="freesolo-input" placeholder="Select or type e.g. Fresher / N/A" autocomplete="off">
+                <button type="button" class="freesolo-toggle-btn" tabindex="-1" title="Show suggestions" aria-label="Toggle options">
+                  <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+                </button>
+              </div>
+              <div class="freesolo-dropdown" role="listbox"></div>
+            </div>
           </div>
         </div>
 
         <div class="form-group">
           <label for="freelance">Are you working on any Freelance Project, if so how many? <span
               class="req">*</span></label>
-          <input type="text" id="freelance" placeholder="e.g. No / Yes, 1 active project" required>
+          <div class="freesolo-container" id="wrap_freelance">
+            <div class="freesolo-input-wrap">
+              <input type="text" id="freelance" class="freesolo-input" placeholder="Select or type e.g. No" required autocomplete="off">
+              <button type="button" class="freesolo-toggle-btn" tabindex="-1" title="Show suggestions" aria-label="Toggle options">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+            </div>
+            <div class="freesolo-dropdown" role="listbox"></div>
+          </div>
         </div>
 
         <!-- 4. WORK MODE & TIMINGS -->
@@ -525,23 +882,43 @@
 
         <div class="form-group">
           <label for="workMode">Work Mode Preference <span class="req">*</span></label>
-          <select id="workMode" required>
-            <option value="WFH all days with Fixed Day/hrs">WFH all days with Fixed Day/hrs</option>
-            <option value="Hybrid">Hybrid</option>
-            <option value="Flexible">Flexible</option>
-          </select>
+          <div class="freesolo-container" id="wrap_workMode">
+            <div class="freesolo-input-wrap">
+              <input type="text" id="workMode" class="freesolo-input" placeholder="Select or type e.g. Hybrid / WFH" required autocomplete="off">
+              <button type="button" class="freesolo-toggle-btn" tabindex="-1" title="Show suggestions" aria-label="Toggle options">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+            </div>
+            <div class="freesolo-dropdown" role="listbox"></div>
+          </div>
+          <div class="freesolo-hint">Select a preset or type your preferred working model</div>
         </div>
 
         <div class="form-group">
           <label for="durationTimings">Work Duration & timings you can work <span class="req">*</span></label>
-          <input type="text" id="durationTimings" placeholder="e.g. 6 to 8 hours daily (10:00 AM - 6:00 PM)" required>
+          <div class="freesolo-container" id="wrap_durationTimings">
+            <div class="freesolo-input-wrap">
+              <input type="text" id="durationTimings" class="freesolo-input" placeholder="Select or type e.g. 6 to 8 hours daily (10:00 AM - 6:00 PM)" required autocomplete="off">
+              <button type="button" class="freesolo-toggle-btn" tabindex="-1" title="Show suggestions" aria-label="Toggle options">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+            </div>
+            <div class="freesolo-dropdown" role="listbox"></div>
+          </div>
         </div>
 
         <div class="form-group">
           <label for="availabilitySlots">Preferred Availability (Weekday and Weekend Time Slots) <span
               class="req">*</span></label>
-          <input type="text" id="availabilitySlots" placeholder="e.g. Weekdays: Mon-Fri full day, Weekends: Sat morning"
-            required>
+          <div class="freesolo-container" id="wrap_availabilitySlots">
+            <div class="freesolo-input-wrap">
+              <input type="text" id="availabilitySlots" class="freesolo-input" placeholder="Select or type e.g. Weekdays: Mon-Fri full day, Weekends: Sat morning" required autocomplete="off">
+              <button type="button" class="freesolo-toggle-btn" tabindex="-1" title="Show suggestions" aria-label="Toggle options">
+                <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>
+              </button>
+            </div>
+            <div class="freesolo-dropdown" role="listbox"></div>
+          </div>
         </div>
 
         <!-- Live Message Preview Box -->
@@ -550,7 +927,7 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
             </svg>
-            Live WhatsApp Message Preview (Recipient: Infogenx HR Team)
+            Live WhatsApp Message Preview
           </div>
           <pre class="preview-text" id="previewText">Loading preview...</pre>
         </div>
@@ -570,7 +947,7 @@
       </form>
 
       <div class="portal-footer">
-        <p>© 2026 Infogenx Technologies Pvt. Ltd. • HR Recruitment Team • <a href="https://candidates.infogenx.com"
+        <p>© 2026 Infogenx Technologies Pvt. Ltd. • <a href="https://candidates.infogenx.com/"
             target="_blank">Candidate Portal</a></p>
       </div>
 
@@ -645,57 +1022,423 @@
       draw();
     })();
 
-    // Standard roles list (same core options across all types)
-    const standardRoles = [
-      "Graphic Designer",
-      "HR / Recruiter",
-      "Digital Marketing",
-      "Web / Full Stack Developer",
-      "Odoo ERP Developer / Consultant",
-      "Zoho Developer / Consultant",
-      "Business Development / Sales",
-      "Content & Copywriter",
-      "Other"
-    ];
+    // FreeSolo Autocomplete Engine
+    const freeSoloInstances = {};
 
-    function handleTypeChange() {
-      const type = document.getElementById('applicationType').value;
-      const roleSelect = document.getElementById('appliedRole');
-      const roleLabel = document.getElementById('roleLabelText');
+    function setupFreeSolo(config) {
+      const {
+        containerId,
+        inputId,
+        options,
+        initialValue,
+        onSelect
+      } = config;
 
-      if (roleLabel) {
-        if (type === "Internship") {
-          roleLabel.textContent = "Internship Role";
-        } else if (type === "Freelance") {
-          roleLabel.textContent = "Freelance Project Role";
-        } else {
-          roleLabel.textContent = "Job / Trainee Role";
+      const container = document.getElementById(containerId);
+      const input = document.getElementById(inputId);
+      if (!container || !input) return null;
+
+      const toggleBtn = container.querySelector('.freesolo-toggle-btn');
+      const dropdown = container.querySelector('.freesolo-dropdown');
+      let currentOptions = [...options];
+      let highlightedIndex = -1;
+
+      if (initialValue && !input.value) {
+        input.value = initialValue;
+      }
+
+      function escapeHtml(str) {
+        if (!str) return '';
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function renderDropdown(filterText = '') {
+        dropdown.innerHTML = '';
+        const trimmed = (filterText || '').toLowerCase().trim();
+        const filtered = trimmed
+          ? currentOptions.filter(opt => opt.toLowerCase().includes(trimmed))
+          : currentOptions;
+
+        if (filtered.length > 0) {
+          filtered.forEach((opt) => {
+            const item = document.createElement('div');
+            item.className = 'freesolo-option' + (opt.toLowerCase() === (input.value || '').toLowerCase().trim() ? ' selected' : '');
+            item.setAttribute('role', 'option');
+            item.textContent = opt;
+
+            item.addEventListener('mousedown', (e) => {
+              e.preventDefault();
+              selectOption(opt);
+            });
+            dropdown.appendChild(item);
+          });
+        }
+
+        // FreeSolo custom entry acknowledgment badge
+        if (trimmed && !currentOptions.some(opt => opt.toLowerCase() === trimmed)) {
+          const customNotice = document.createElement('div');
+          customNotice.className = 'freesolo-custom-item';
+          customNotice.innerHTML = `<span>✏️ Custom Value:</span> <b>${escapeHtml(input.value)}</b> <span>(Press Enter / Tap to keep)</span>`;
+          customNotice.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            closeDropdown();
+          });
+          dropdown.appendChild(customNotice);
+        } else if (filtered.length === 0) {
+          const emptyItem = document.createElement('div');
+          emptyItem.className = 'freesolo-custom-item';
+          emptyItem.textContent = 'Type anything custom or select from options';
+          dropdown.appendChild(emptyItem);
+        }
+
+        highlightedIndex = -1;
+      }
+
+      function openDropdown() {
+        document.querySelectorAll('.freesolo-container.open').forEach(c => {
+          if (c !== container) c.classList.remove('open');
+        });
+        renderDropdown(input.value);
+        container.classList.add('open');
+      }
+
+      function closeDropdown() {
+        container.classList.remove('open');
+      }
+
+      function selectOption(val) {
+        input.value = val;
+        closeDropdown();
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        if (typeof onSelect === 'function') {
+          onSelect(val);
         }
       }
 
-      roleSelect.innerHTML = '';
-      const optGroup = document.createElement('optgroup');
-      if (type === "Internship") {
-        optGroup.label = "Internship Roles";
-      } else if (type === "Freelance") {
-        optGroup.label = "Freelance Project Roles";
-      } else {
-        optGroup.label = "Job / Trainee Roles";
+      // Input listeners
+      input.addEventListener('focus', () => {
+        openDropdown();
+      });
+
+      input.addEventListener('input', () => {
+        if (!container.classList.contains('open')) {
+          container.classList.add('open');
+        }
+        renderDropdown(input.value);
+      });
+
+      input.addEventListener('keydown', (e) => {
+        if (!container.classList.contains('open')) {
+          if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+            openDropdown();
+            e.preventDefault();
+          }
+          return;
+        }
+
+        const items = dropdown.querySelectorAll('.freesolo-option');
+        if (e.key === 'ArrowDown') {
+          e.preventDefault();
+          highlightedIndex = Math.min(highlightedIndex + 1, items.length - 1);
+          updateHighlight(items);
+        } else if (e.key === 'ArrowUp') {
+          e.preventDefault();
+          highlightedIndex = Math.max(highlightedIndex - 1, 0);
+          updateHighlight(items);
+        } else if (e.key === 'Enter') {
+          if (highlightedIndex >= 0 && items[highlightedIndex]) {
+            e.preventDefault();
+            selectOption(items[highlightedIndex].textContent);
+          } else {
+            // FreeSolo accept typed custom text
+            closeDropdown();
+          }
+        } else if (e.key === 'Escape') {
+          closeDropdown();
+        }
+      });
+
+      function updateHighlight(items) {
+        items.forEach((it, idx) => {
+          if (idx === highlightedIndex) {
+            it.classList.add('highlighted');
+            it.scrollIntoView({ block: 'nearest' });
+          } else {
+            it.classList.remove('highlighted');
+          }
+        });
       }
 
-      standardRoles.forEach(r => {
-        const opt = document.createElement('option');
-        opt.value = r;
-        opt.textContent = r;
-        optGroup.appendChild(opt);
-      });
-      roleSelect.appendChild(optGroup);
+      // Toggle chevron button
+      if (toggleBtn) {
+        toggleBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          if (container.classList.contains('open')) {
+            closeDropdown();
+          } else {
+            input.focus();
+            openDropdown();
+          }
+        });
+      }
 
-      updateMessagePreview();
+      // Close on outside click
+      document.addEventListener('click', (e) => {
+        if (!container.contains(e.target)) {
+          closeDropdown();
+        }
+      });
+
+      function setOptions(newOptions) {
+        currentOptions = [...newOptions];
+        if (container.classList.contains('open')) {
+          renderDropdown(input.value);
+        }
+      }
+
+      freeSoloInstances[inputId] = {
+        setOptions,
+        open: openDropdown,
+        close: closeDropdown,
+        select: selectOption
+      };
+
+      return freeSoloInstances[inputId];
     }
 
-    // Initialize roles dropdown
-    handleTypeChange();
+    // Role Presets based on Application Type
+    const rolePresets = {
+      internship: [
+        "Graphic Designer Intern",
+        "HR / Recruitment Intern",
+        "Digital Marketing Intern",
+        "Web / Full Stack Developer Intern",
+        "Odoo ERP Developer Intern",
+        "Zoho Developer Intern",
+        "Business Development Intern",
+        "UI/UX Designer Intern",
+        "Python / AI Developer Intern",
+        "Other / Custom Role"
+      ],
+      job: [
+        "Graphic Designer",
+        "HR / Recruiter",
+        "Digital Marketing Executive",
+        "Web / Full Stack Developer",
+        "Odoo ERP Developer / Consultant",
+        "Zoho Developer / Consultant",
+        "Business Development Executive",
+        "UI/UX Designer",
+        "Node.js / React Developer",
+        "Python / AI Engineer",
+        "Data Analyst / MIS Executive",
+        "Other / Custom Role"
+      ],
+      freelance: [
+        "Graphic Designer",
+        "HR / Recruiter",
+        "Digital Marketing Executive",
+        "Web / Full Stack Developer",
+        "Odoo ERP Developer / Consultant",
+        "Zoho Developer / Consultant",
+        "Business Development Executive",
+        "UI/UX Designer",
+        "Node.js / React Developer",
+        "Python / AI Engineer",
+        "Data Analyst / MIS Executive",
+        "Other / Custom Role"
+      ]
+    };
+
+    function updateRoleOptionsForType(appTypeVal) {
+      const typeLower = (appTypeVal || '').toLowerCase();
+      const roleLabel = document.getElementById('roleLabelText');
+      let targetPresets = rolePresets.job;
+
+      if (typeLower.includes('intern')) {
+        targetPresets = rolePresets.internship;
+        if (roleLabel) roleLabel.textContent = "Internship Opportunity (Role)";
+      } else if (typeLower.includes('free')) {
+        targetPresets = rolePresets.freelance;
+        if (roleLabel) roleLabel.textContent = "Freelance Project Role";
+      } else {
+        targetPresets = rolePresets.job;
+        if (roleLabel) roleLabel.textContent = "Job Opening (Role)";
+      }
+
+      if (freeSoloInstances['appliedRole']) {
+        freeSoloInstances['appliedRole'].setOptions(targetPresets);
+        const currentRole = document.getElementById('appliedRole').value;
+        const allKnown = [...rolePresets.internship, ...rolePresets.job, ...rolePresets.freelance];
+        if (!targetPresets.includes(currentRole) && allKnown.includes(currentRole)) {
+          freeSoloInstances['appliedRole'].select(targetPresets[0]);
+        }
+      }
+    }
+
+    // Initialize all FreeSolo Autocomplete Fields
+    setupFreeSolo({
+      containerId: 'wrap_applicationType',
+      inputId: 'applicationType',
+      options: [
+        "Job",
+        "Freelance",
+        "Internship"
+      ],
+      initialValue: "Internship",
+      onSelect: (val) => {
+        updateRoleOptionsForType(val);
+        updateMessagePreview();
+      }
+    });
+
+    setupFreeSolo({
+      containerId: 'wrap_appliedRole',
+      inputId: 'appliedRole',
+      options: rolePresets.internship,
+      initialValue: "Graphic Designer Intern",
+      onSelect: () => updateMessagePreview()
+    });
+
+    setupFreeSolo({
+      containerId: 'wrap_experience',
+      inputId: 'experience',
+      options: [
+        "Fresher (0 Years)",
+        "0 to 6 Months",
+        "6 Months to 1 Year",
+        "1 to 2 Years",
+        "2 to 3 Years",
+        "3+ Years Experience"
+      ],
+      initialValue: "Fresher (0 Years)",
+      onSelect: () => updateMessagePreview()
+    });
+
+    setupFreeSolo({
+      containerId: 'wrap_qualification',
+      inputId: 'qualification',
+      options: [
+        "B.E / B.Tech (2024 / 2025)",
+        "BCA / MCA",
+        "B.Sc / M.Sc Computer Science",
+        "MBA / BBA",
+        "B.Com / M.Com",
+        "Diploma",
+        "Arts & Science Graduate",
+        "Any Degree (Pursuing / Passed)"
+      ],
+      initialValue: "B.E / B.Tech (2024 / 2025)",
+      onSelect: () => updateMessagePreview()
+    });
+
+    setupFreeSolo({
+      containerId: 'wrap_purpose',
+      inputId: 'purpose',
+      options: [
+        "Just to Learn and gain experience",
+        "Learn and Earn",
+        "Only to Earn",
+        "Career Transition & Skill Building",
+        "College Internship / Academic Project"
+      ],
+      initialValue: "Just to Learn and gain experience",
+      onSelect: () => updateMessagePreview()
+    });
+
+    setupFreeSolo({
+      containerId: 'wrap_startDate',
+      inputId: 'startDate',
+      options: [
+        "Immediately",
+        "Within 1 Week",
+        "Next Monday",
+        "Within 15 Days",
+        "Next Month"
+      ],
+      initialValue: "Immediately",
+      onSelect: () => updateMessagePreview()
+    });
+
+    setupFreeSolo({
+      containerId: 'wrap_currentSalary',
+      inputId: 'currentSalary',
+      options: [
+        "Fresher / N/A",
+        "₹10,000 - ₹15,000 / month",
+        "₹15,000 - ₹25,000 / month",
+        "₹25,000 - ₹40,000 / month",
+        "₹40,000+ / month"
+      ],
+      initialValue: "Fresher / N/A",
+      onSelect: () => updateMessagePreview()
+    });
+
+    setupFreeSolo({
+      containerId: 'wrap_freelance',
+      inputId: 'freelance',
+      options: [
+        "No",
+        "Yes, 1 active project",
+        "Yes, 2+ active projects"
+      ],
+      initialValue: "No",
+      onSelect: () => updateMessagePreview()
+    });
+
+    setupFreeSolo({
+      containerId: 'wrap_workMode',
+      inputId: 'workMode',
+      options: [
+        "WFH all days with Fixed Day/hrs",
+        "Hybrid (WFH + Office)",
+        "Flexible Hours",
+        "On-site / In-Office (Chennai)",
+        "Remote / Virtual"
+      ],
+      initialValue: "WFH all days with Fixed Day/hrs",
+      onSelect: () => updateMessagePreview()
+    });
+
+    setupFreeSolo({
+      containerId: 'wrap_durationTimings',
+      inputId: 'durationTimings',
+      options: [
+        "6 to 8 hours daily (10:00 AM - 6:00 PM)",
+        "Full Time (9:30 AM - 6:30 PM)",
+        "Part Time (4 to 5 hours daily)",
+        "Flexible Working Hours"
+      ],
+      initialValue: "6 to 8 hours daily (10:00 AM - 6:00 PM)",
+      onSelect: () => updateMessagePreview()
+    });
+
+    setupFreeSolo({
+      containerId: 'wrap_availabilitySlots',
+      inputId: 'availabilitySlots',
+      options: [
+        "Weekdays: Mon-Fri full day, Weekends: Sat morning",
+        "Weekdays Only (Monday to Friday)",
+        "All 6 Days (Monday to Saturday)",
+        "Flexible Time Slots"
+      ],
+      initialValue: "Weekdays: Mon-Fri full day, Weekends: Sat morning",
+      onSelect: () => updateMessagePreview()
+    });
+
+    // Also update role options dynamically if user manually types in applicationType
+    const appTypeInput = document.getElementById('applicationType');
+    if (appTypeInput) {
+      appTypeInput.addEventListener('input', (e) => {
+        updateRoleOptionsForType(e.target.value);
+      });
+    }
 
     // WhatsApp Message Builder
     function buildMessageText() {
@@ -751,7 +1494,7 @@ Please review my application for Infogenx Technologies.`;
 
     function updateMessagePreview() {
       const msg = buildMessageText();
-      document.getElementById('previewText').textContent = `Recipient: Infogenx HR Team\n\n${msg}`;
+      document.getElementById('previewText').textContent = msg;
       return msg;
     }
 
