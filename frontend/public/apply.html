@@ -431,7 +431,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label for="appliedRole">Applying For (Role) <span class="req">*</span></label>
+            <label for="appliedRole"><span id="roleLabelText">Internship Opportunity (Role)</span> <span class="req">*</span></label>
             <select id="appliedRole" required>
               <!-- Populated dynamically based on Application Type -->
             </select>
@@ -644,15 +644,24 @@
     function handleTypeChange() {
       const type = document.getElementById('applicationType').value;
       const roleSelect = document.getElementById('appliedRole');
+      const roleLabel = document.getElementById('roleLabelText');
       const roles = roleOptions[type] || roleOptions["Internship"];
 
+      if (roleLabel) {
+        roleLabel.textContent = type === "Internship" ? "Internship Opportunity (Role)" : "Job Opening (Role)";
+      }
+
       roleSelect.innerHTML = '';
+      const optGroup = document.createElement('optgroup');
+      optGroup.label = type === "Internship" ? "🎓 Internship Opportunities" : "💼 Job / Trainee Openings";
+
       roles.forEach(r => {
         const opt = document.createElement('option');
         opt.value = r;
         opt.textContent = r;
-        roleSelect.appendChild(opt);
+        optGroup.appendChild(opt);
       });
+      roleSelect.appendChild(optGroup);
 
       updateMessagePreview();
     }
@@ -681,7 +690,7 @@
       const durationTimings = document.getElementById('durationTimings').value.trim() || '[Work Duration & timings]';
       const availabilitySlots = document.getElementById('availabilitySlots').value.trim() || '[Preferred Availability]';
 
-      return `Hi HR Team, I am submitting my Application Details for Infogenx:
+      return `Dear HR, Below is the my Details for Infogenx:
 
 Name: ${name}
 Contact No: ${mobile}
