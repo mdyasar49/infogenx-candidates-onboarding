@@ -226,69 +226,7 @@
       border: 1px solid #bfdbfe;
     }
 
-    /* Recipient Notification & Toggle Box */
-    .recipient-card {
-      background: #f8fafc;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 14px;
-      padding: 14px 16px;
-      margin-bottom: 24px;
-      text-align: left;
-    }
 
-    .recipient-title {
-      font-size: 12px;
-      font-weight: 800;
-      color: var(--navy-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 10px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .recipient-title svg {
-      color: var(--orange-blood);
-    }
-
-    .recipient-options {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-
-    @media (max-width: 560px) {
-      .recipient-options {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .radio-pill {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #ffffff;
-      border: 1.5px solid #cbd5e1;
-      border-radius: 10px;
-      padding: 10px 14px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 13px;
-    }
-
-    .radio-pill input[type="radio"] {
-      accent-color: var(--orange-blood);
-      cursor: pointer;
-      width: 16px;
-      height: 16px;
-    }
-
-    .radio-pill.selected {
-      border-color: var(--orange-blood);
-      background: #fff8f5;
-      box-shadow: 0 2px 8px rgba(230, 85, 37, 0.12);
-    }
 
     .recipient-info-box {
       display: flex;
@@ -684,32 +622,6 @@
         </div>
       </div>
 
-      <!-- Recipient Routing Card -->
-      <div class="recipient-card">
-        <div class="recipient-title">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
-          </svg>
-          Direct WhatsApp Delivery Target:
-        </div>
-        <div class="recipient-options">
-          <label class="radio-pill selected" id="optAnand">
-            <input type="radio" name="recipientTarget" value="anand" checked onchange="updateRecipient()">
-            <div>
-              <strong style="color: var(--navy-primary); display: block;">Anand Sir (HR)</strong>
-              <span style="font-size: 11px; color: #64748b;">+91 97878 06366 (Production)</span>
-            </div>
-          </label>
-          <label class="radio-pill" id="optTest">
-            <input type="radio" name="recipientTarget" value="test" onchange="updateRecipient()">
-            <div>
-              <strong style="color: var(--navy-primary); display: block;">Verification Test</strong>
-              <span style="font-size: 11px; color: #64748b;">+91 90259 43184 (Testing)</span>
-            </div>
-          </label>
-        </div>
-      </div>
-
       <form id="candidateApplicationForm" onsubmit="handleFormSubmit(event)">
 
         <!-- 1. PERSONAL & CONTACT DETAILS -->
@@ -1065,10 +977,11 @@
 
         if (filtered.length > 0) {
           filtered.forEach((opt) => {
+            const isSelected = opt.toLowerCase() === (input.value || '').toLowerCase().trim();
             const item = document.createElement('div');
-            item.className = 'freesolo-option' + (opt.toLowerCase() === (input.value || '').toLowerCase().trim() ? ' selected' : '');
+            item.className = 'freesolo-option' + (isSelected ? ' selected' : '');
             item.setAttribute('role', 'option');
-            item.textContent = opt;
+            item.innerHTML = `<span>${escapeHtml(opt)}</span>${isSelected ? '<span style="color:#10b981;font-weight:bold;margin-left:8px;">✓</span>' : ''}`;
 
             item.addEventListener('mousedown', (e) => {
               e.preventDefault();
@@ -1082,27 +995,32 @@
         if (trimmed && !currentOptions.some(opt => opt.toLowerCase() === trimmed)) {
           const customNotice = document.createElement('div');
           customNotice.className = 'freesolo-custom-item';
-          customNotice.innerHTML = `<span>✏️ Custom Value:</span> <b>${escapeHtml(input.value)}</b> <span>(Press Enter / Tap to keep)</span>`;
+          customNotice.innerHTML = `<span>✏️ Use Custom Value:</span> <b>${escapeHtml(input.value)}</b> <span>(Press Enter / Tap to keep)</span>`;
           customNotice.addEventListener('mousedown', (e) => {
             e.preventDefault();
-            closeDropdown();
+            selectOption(input.value.trim());
           });
           dropdown.appendChild(customNotice);
         } else if (filtered.length === 0) {
           const emptyItem = document.createElement('div');
           emptyItem.className = 'freesolo-custom-item';
-          emptyItem.textContent = 'Type anything custom or select from options';
+          emptyItem.innerHTML = `<span>✏️ Use Custom:</span> <b>${escapeHtml(input.value)}</b>`;
+          emptyItem.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            selectOption(input.value.trim());
+          });
           dropdown.appendChild(emptyItem);
         }
 
         highlightedIndex = -1;
       }
 
-      function openDropdown() {
+      function openDropdown(showAll = true) {
         document.querySelectorAll('.freesolo-container.open').forEach(c => {
           if (c !== container) c.classList.remove('open');
         });
-        renderDropdown(input.value);
+        // ALWAYS show all options on click/focus so user sees all available choices!
+        renderDropdown(showAll ? '' : input.value);
         container.classList.add('open');
       }
 
@@ -1120,11 +1038,16 @@
         }
       }
 
-      // Input listeners
+      // Input listeners: show ALL options on focus or click
       input.addEventListener('focus', () => {
-        openDropdown();
+        openDropdown(true);
       });
 
+      input.addEventListener('click', () => {
+        openDropdown(true);
+      });
+
+      // Filter dynamically when typing
       input.addEventListener('input', () => {
         if (!container.classList.contains('open')) {
           container.classList.add('open');
@@ -1332,7 +1255,8 @@
         "B.Com / M.Com",
         "Diploma",
         "Arts & Science Graduate",
-        "Any Degree (Pursuing / Passed)"
+        "Any Degree (Pursuing / Passed)",
+        "Other / Custom Qualification"
       ],
       initialValue: "B.E / B.Tech (2024 / 2025)",
       onSelect: () => updateMessagePreview()
